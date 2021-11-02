@@ -51,7 +51,7 @@ int check_args(int argc, char**argv){
 
 //
 char* check_entension(char** argv, int fase_flag){
-	char* output_file; // Q: make proper alloc?
+	char* output_file; 
 	char* input_file;
 	char* check_in1;
 	char ext_out[]= ".sol";
