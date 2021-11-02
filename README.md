@@ -22,6 +22,7 @@ git commit -m "Message describing changes"
 git push -u origin yourbranchname
 
 git pull origin master
+
 ----------------------
 
 -> create new pull request in github online
