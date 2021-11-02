@@ -9,12 +9,18 @@
 int main(int argc, char**argv){
     
     FILE* fptr;
-    char* file_out = (char*)malloc(100);
+    char* file_out;
     int fase_flag = check_args(argc,argv);
 
     //printf("flag is %d\n",fase_flag);
 
     fptr = open_file(argv,fase_flag);
+
+    if(fase_flag==1)
+        file_out=(char*)malloc(strlen(argv[2])+1);
+
+    if(fase_flag==2)
+        file_out=(char*)malloc(strlen(argv[1])+1);
 
     //if(fptr != NULL)
         //printf("file pointer check\n");
