@@ -110,3 +110,25 @@ void write_to_file(char* nome_file_out){
 	fclose(fpOut);
 	//free(fpOut);
 }
+
+void lab_printer(char** lab_matrix, lab_info* lab){
+
+	int i,j;
+	for(i=0;i<lab->L;i++){
+
+		for(j=0;i<lab->C;j++){
+
+			printf("%c",lab_matrix[i][j]);
+
+		}
+		printf("\n");
+	}
+
+}
+
+int is_lab_valid(lab_info* lab){
+
+
+
+	
+}

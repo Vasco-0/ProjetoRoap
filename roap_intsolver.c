@@ -3,7 +3,6 @@
 
 	->
 
-*/jsbjsdddddddddddddddda
+*/
 
-lxlmvlçxcm,lv
 #include "roap_lib.h"
