@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 /* alternativa de usar matrix LxC*/
 typedef struct lab_info{
 
