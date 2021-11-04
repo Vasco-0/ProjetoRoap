@@ -5,6 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct node
+{
+    int vertex;
+    struct node* next;
+}node;
+
+typedef struct graph
+{
+    int n_vertex;
+    struct node** adj_list;
+};
+
 // lib.c 
 FILE* open_file(char** argv, int fase_flag);
 int check_args(int argc, char**argv);
