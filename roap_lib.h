@@ -30,9 +30,11 @@ typedef struct lab_info{
 
 /*NM- Vasco*/
 typedef struct parede{
-    int l;
+  
+    struct parede* prev;// not sure if needed
     int c;
     int val;
+    struct parede* next;
 
 }parede;
 
@@ -46,14 +48,16 @@ char* check_extension(char** argv, int fase_flag); /*NM - Vasco*/
 int is_lab_valid(lab_info* new);
 
 lab_info* read_file(FILE* fptr,lab_info* head);/*Livre*/
+int is_wall_valid(int l,int c,int val, lab_info* lab);
 lab_info* insert_lab_list(lab_info* head,lab_info* new_lab);/*Livre*/
 
 int get_weight(int l, int c, lab_info* lab, parede** wall); /*EP - Vasco*/
+parede* insert_col(int l,int c,int v,parede** wall_vector,lab_info* lab);
 
-void conceptual_matrix_printer(parede** wall, lab_info* lab);/*L*/
+parede** init_wall_vect(parede** wall_vector,lab_info* new);
 
 lab_info* solve(lab_info* lab, parede** wall);/*EP - Vasco*/
-lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
+
 
 
 /* intsolver.c ------------------------------------- */
@@ -62,5 +66,11 @@ lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
 
 
 /* djisktra.c ------------------------------------- */
+
+
+/* auxtools.c ------------------------------------- */
+void print_wall_vector(parede** wall_vect,lab_info* lab);
+void conceptual_matrix_printer(parede** wall, lab_info* lab);/*L*/
+lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
 
 #endif

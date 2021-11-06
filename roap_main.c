@@ -33,9 +33,10 @@ int main(int argc, char**argv){
 
     strcpy(file_out,(check_extension(argv,fase_flag)));
 
-    //read_file(fptr,head);
+    //printf("read file door");
+    //-> seg fault read_file(fptr,head);
 
-    read_file_beta(head);
+    //read_file_beta(head);
 
     printf("\nOK\n");
 
