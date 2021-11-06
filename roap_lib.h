@@ -5,8 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+    aqui da mesma forma as estruturas e cabeçalhos vão ter as mesmas 3 designações
+    NM - nome
+    EP - nome
+    L
+*/
 
-/* alternativa de usar matrix LxC*/
+/*NM - Vasco*/
 typedef struct lab_info{
 
     int id; /* for debug purposes */
@@ -15,35 +21,46 @@ typedef struct lab_info{
     int L_target;
     int C_target;
     int P;
+    int B; 
     int valid_flag;
-    int resposta;
-    lab_info * next;
+    struct lab_info * next;
+    /*talvez adicionar lista de paredes* partidas*/
 
 }lab_info;
 
+/*NM- Vasco*/
+typedef struct parede{
+    int l;
+    int c;
+    int val;
 
-/* lib.c */
+}parede;
 
-/*file IO*/
-FILE* open_file(char** argv, int fase_flag);
-void write_to_file(char* nome_file_out);
+/* lib.c -------------------------------------*/
 
-/*verifications*/
-int check_args(int argc, char**argv);
-char* check_entension(char** argv, int fase_flag);
-int is_lab_valid(lab_info* lab);
+FILE* open_file(char** argv, int fase_flag);/*NM-Vasco*/
+void write_to_file(char* nome_file_out); /*L*/
 
-void read_file(FILE* fptr);
-char** matrix_alloc_fill(lab_info* lab);
-lab_info* new_lab_alloc_fill(int L,int C,int L_t,int C_t,int P,int valid_flag);
-lab_info* insert_lab_list(lab_info* head,lab_info* new_lab);
+int check_args(int argc, char**argv); /*NM - Vasco*/
+char* check_extension(char** argv, int fase_flag); /*NM - Vasco*/
+int is_lab_valid(lab_info* new);
 
-void is_neighbour_valid(int l_n,int c_n);
+lab_info* read_file(FILE* fptr,lab_info* head);/*Livre*/
+lab_info* insert_lab_list(lab_info* head,lab_info* new_lab);/*Livre*/
 
-void matrix_printer(char** lab_matrix, lab_info* lab);
+int get_weight(int l, int c, lab_info* lab, parede** wall); /*EP - Vasco*/
 
-/* intsolver.c */
+void conceptual_matrix_printer(parede** wall, lab_info* lab);/*L*/
 
-/* djisktra.c */
+lab_info* solve(lab_info* lab, parede** wall);/*EP - Vasco*/
+lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
+
+
+/* intsolver.c ------------------------------------- */
+
+
+
+
+/* djisktra.c ------------------------------------- */
 
 #endif
