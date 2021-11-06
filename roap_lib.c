@@ -108,7 +108,6 @@ char* check_extension(char** argv, int fase_flag){
 		strcpy(output_file,input_file);
     	strcat(output_file,ext_out);
 	}
-
 	return output_file;
 }
 
@@ -126,7 +125,7 @@ void write_to_file(char* nome_file_out){
 
 /*-------------Livre ---------------*/
 void conceptual_matrix_printer(parede** wall, lab_info* lab){
-/* for debug purposes only */
+/* for debug purposes only - Not working*/
 
 	int i,j;
 
@@ -160,10 +159,7 @@ int get_weight(int l, int c, lab_info* lab, parede** wall){
 	   if preta returns -1 
 	   if out of bounds returns -3
 	   */
-	int a=wall[2]->l;
 	int b=wall[2]->c;
-
-	printf("%d %d ",a,b);
 
 	if(l>lab->L || c>lab->C || l<1 || c<1)
 		return -3;
@@ -186,13 +182,14 @@ int get_weight(int l, int c, lab_info* lab, parede** wall){
 lab_info* read_file(FILE* fptr, lab_info* head){
 
 	lab_info* new = NULL;
+	parede** wall_vector = NULL;
 	int id = 0;
 	int a, l_aux,c_aux,lt_aux,ct_aux,p_aux,b;
 
 	while((a=fscanf(fptr," %d %d %d %d %d", &l_aux,&c_aux,&lt_aux,&ct_aux,&p_aux)==5)){
 		
 		id ++;
-		new = (lab_info*)malloc(sizeof(lab_info));
+		new = malloc(sizeof(lab_info));
 		new->id=id;
 		new->L=l_aux;
 		new->C=c_aux;
@@ -208,19 +205,83 @@ lab_info* read_file(FILE* fptr, lab_info* head){
 		{
 			new->B = -1;
 		}
+		if (b==0)
+		{
+			wall_vector=init_wall_vect(wall_vector,new);
+			//print_wall_vector(wall_vector,new);
 
-		
+			/*for(int j=1;j>=new->P;j++)
+			{
+				int lp,cp,vp,c;
+				if ((c= fscanf(fptr,"%d %d %d",&lp,&cp,&vp))==3){
 
+					if(is_wall_valid(lp,cp,vp)==0)
+					{
+						wall_vector[lp]=insert_col(lp,cp,vp,wall_vector,new);
+					}
+				}
+
+			}*/
+
+		}
 	}
-
+	printf("alive");
 	return new;
+
+}
+
+/*----------------------------Não Mexer - Vasco--------------------*/
+parede** init_wall_vect(parede** wall_vector,lab_info* new){
+	wall_vector=(parede**)malloc(sizeof(parede*)*new->L);
+			/*for(int i=1;i<4;i++)
+			{
+				//to avoid trying to acess non alloced memory
+				//wall_vector[i]->next=(parede*)malloc(sizeof(parede));
+				wall_vector[i]->c=0;
+				wall_vector[i]->val=-4;
+			}*/
+			printf("hello");
+			printf("%d",new->L);
+	return wall_vector;
+}
+
+/*---------------------- Livre ----------------*/
+parede* insert_col(int l,int c,int v,parede** wall_vector,lab_info* lab){ /*insere na lista organizado*/ 
+	parede* new_col;
+	wall_vector[l]->next=(parede*)malloc(sizeof(parede));
+
+	return wall_vector[l]->next;
+}
+
+/*------------------Não Mexer - Vasco ----------------------*/
+int is_wall_valid(int l,int c,int val, lab_info* lab){
+	if(l>lab->L || c>lab->C || l<1 || c<1 || val<-1 || val==0)
+		return -1;
+	
+	return 0;
+}
+
+/*-----------------Não Mexer- Vasco------------------*/
+void print_wall_vector(parede** wall_vect,lab_info* lab){
+
+	for(int i=1;i<lab->L;i++){
+		while(1)
+		{
+			printf(" L: %d",i);
+			printf(" C: %d ",wall_vect[i]->c);
+			printf(" VAL: %d ",wall_vect[i]->val);
+			if(wall_vect[i]->next==NULL)
+				break;
+		}
+		
+	}
 
 }
 
 /*Em progresso - Vasco - nota: enquanto o read file não está pronto posso ir testando o algoritmo*/
 lab_info* read_file_beta(lab_info* lab){
 
-	lab = (lab_info*)malloc(sizeof(lab_info));
+	lab = malloc(sizeof(lab_info));
 		lab->L=8;
 		lab->C=6;
 		lab->L_target=5;
@@ -228,15 +289,13 @@ lab_info* read_file_beta(lab_info* lab){
 		lab->P=8;
 
 	 parede** wall=(parede**)malloc(sizeof(parede*)* (lab->P + 1));
-	 	wall[1]->l=2;
+	
 	 	wall[1]->c=1;
 	 	wall[1]->val=308;
-
-	 	wall[2]->l=3;
+	 	
 	 	wall[2]->c=4;
 	 	wall[2]->val=10;
 
-	 	wall[3]->l=1;
 	 	wall[3]->c=6;
 	 	wall[3]->val=7;
 
