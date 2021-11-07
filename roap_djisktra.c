@@ -27,7 +27,7 @@ slot** init_slot_matrix(lab_info* lab)
 	for(int j=0; j<(lab->L); j++){
 
 		for(int k=0;k<(lab->C); k++){
-			slot_matrix[j][k].w=INFINITY;
+			slot_matrix[j][k].w=INF;
 		}
 	}
 

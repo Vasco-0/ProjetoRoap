@@ -15,10 +15,10 @@ CC = gcc
 CFLAGS = -Wall -std=c99 -O3
 
 #   Sources
-SOURCES = roap_main.c roap_lib.c roap_intsolver.c roap_djisktra.c roap_auxtools.c roap_walls.c
+SOURCES = roap_main.c roap_lib.c roap_intsolver.c roap_djisktra.c roap_auxtools.c 
 
 #   Objects  ('Make' automatically compiles .c to .o)
-OBJECTS_A = roap_main.o roap_lib.o roap_intsolver.o roap_djisktra.o roap_auxtools.o roap_walls.o
+OBJECTS_A = roap_main.o roap_lib.o roap_intsolver.o roap_djisktra.o roap_auxtools.o 
 
 
 roap: $(OBJECTS_A)
@@ -33,8 +33,6 @@ roap_intsolver.o: roap_intsolver.c roap_lib.h
 roap_djisktra.o: roap_djisktra.c roap_lib.h
 
 roap_auxtools.o: roap_auxtools.c roap_lib.h
-
-roap_walls.o: roap_walls.c roap_lib.h
 
 
 clean:

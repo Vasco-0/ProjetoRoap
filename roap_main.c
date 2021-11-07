@@ -1,47 +1,73 @@
 #include "roap_lib.h"
+
 /*
-    nota: agora cada função vai ter 3 estados
-
-    ----Não Mexer - Nome ----       (quando a função estiver terminada e funcional) se quisermos alterar algo primeiro falar com o outro
-    ----Em progresso - Nome ---     (não funcional mas a trabalhar nela) tmb é para não mexer
-    ----Livre-----                  (trabalho por fazer não reclamado) 
-
-    NOTA extra: código só vai para o git se não houver seg faults !!
-
-    Nota extra extra: no main se mexer não é para mexer em funções que sejam NM ou EP do outro.
-
+    
 */
 
 int main(int argc, char**argv){
     
     FILE* fptr;
-    lab_info* head = NULL;
-    char* file_out = NULL;
+    nome_file_out = NULL;
+    int fase_flag;
 
-    int fase_flag = check_args(argc,argv);
+    /*vars inter*/
+    lab_info* head= NULL;
+    Lab* new_lab = NULL;
+    int** mat=NULL;
+    int* respostas=NULL;
+    vect_insert_pos=0;
 
-    fptr = open_file(argv,fase_flag);
+    /*vars final*/
+    int P_max=0;
 
-    if(fase_flag==1)
-        file_out=(char*)malloc(strlen(argv[2])+1);
 
-    if(fase_flag==2){
+    fase_flag = check_args(argc, argv);
+    /*flag 1-> inter, flag 2-> final*/
 
-        file_out=(char*)malloc(strlen(argv[1])+1);
-       
+    if(fase_flag==1){
+        check_extension (argv[2], fase_flag);
+        fptr = open_file_in(argv[2]);
+        /*  
+            main inter
+                ->    
+                *(solver: falta A6)*  
+        */
+        fptr = maior_mapa (fptr); 
+        respostas = vect_alloc (respostas, N_mapas);
+	    mat = mat_alloc (mat, L_max+2, C_max+2);
+
+        respostas = Data_Process(respostas, new_lab, fptr, mat);
+        vect_to_File(respostas, nome_file_out); 
+
+        fclose(fptr);
+        free_mat(mat, L_max);
+        free(respostas);
+        free (nome_file_out);
     }
 
-    strcpy(file_out,(check_extension(argv,fase_flag)));
 
-    //printf("read file door");
-    //-> seg fault read_file(fptr,head);
+    if(fase_flag==2){
+        check_extension (argv[1], fase_flag);
+        fptr = open_file_in(argv[1]);
+        /*  
+            main final
+                ->      
+        */
+        fptr = maior_P (fptr, &P_max);             
+        walls=walls_vect_init(walls, P_max);
+                printf("hash size: %d\n", hash_size);
 
-    head=read_file_beta(head);
+        head = Data_Process_final(fptr, walls,head);
 
-    printf("\nOK\n");
+        /*
+        free_walls(walls, hash_size);
+        free_PQ();
+        free(st);
+        free(wt);
+        */
+    }
 
-    write_to_file(file_out);
-    
-    //free(fptr);
+    /*write_to_file(nome_file_out);*/
+
     exit(0);
 }

@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define INFINITY 9999
+#include <limits.h>
 
 typedef struct coord{
 
@@ -29,10 +28,19 @@ typedef struct minHeap{
 
 }minHeap;
 
+typedef struct Lab
+{
+    int L;
+    int C;
+    char variante;
+    int L1;
+    int C1;
+    int L2;
+    int C2;
+    int P;    
+} Lab;
 
-
-/*NM - Vasco*/
-typedef struct lab_info{
+typedef struct lab_info{ /*para o final*/
 
     int id; /* for debug purposes */
     int L;
@@ -47,52 +55,98 @@ typedef struct lab_info{
 
 }lab_info;
 
-/*NM- Vasco*/
-typedef struct parede{
-  
-    struct parede* prev;// not sure if needed
-    int c;
-    int val;
-    struct parede* next;
+/*para paredes*/
+typedef struct parede
+{
+    int L;
+    int C;
+    int custo;
+} parede;
 
-}parede;
 
-/* lib.c -------------------------------------*/
 
-FILE* open_file(char** argv, int fase_flag);/*NM-Vasco*/
-void write_to_file(char* nome_file_out); /*L*/
+char* nome_file_out;
 
-int check_args(int argc, char**argv); /*NM - Vasco*/
-char* check_extension(char** argv, int fase_flag); /*NM - Vasco*/
-int is_lab_valid(lab_info* new);
+int C_max;
+int L_max;
+int N_mapas;
+int vect_insert_pos;
 
-lab_info* read_file(FILE* fptr,lab_info* head);/*Livre*/
-int is_wall_valid(int l,int c,int val, lab_info* lab);
-lab_info* insert_lab_list(lab_info* head,lab_info* new_lab);/*Livre*/
+/*vars final*/
+int hash_size;
+int C_aux;
+int* st;
+int* wt;
+parede** walls;
 
-int get_weight(int l, int c, lab_info* lab, parede** wall); /*EP - Vasco*/
-parede* insert_col(int l,int c,int v,parede** wall_vector,lab_info* lab);
 
-parede** init_wall_vect(parede** wall_vector,lab_info* new);
 
-lab_info* solve(lab_info* lab, parede** wall);/*EP - Vasco*/
+/*  inf->custo "infinito"
+    out->não pertence ao grafo (visto que 0 já é um custo valido)*/
+#define INF INT_MAX
+
+/*================= lib.c ====================*/ 
+FILE* open_file_in(char* filename);
+FILE* open_file_out(char* filename);
+int check_args(int argc, char**argv);
+void check_extension(char* filename, int fase_flag);
+void write_to_file(char* nome_file_out);
+
+int** mat_alloc(int** mat, int L, int C);
+int* vect_alloc(int* vect, int size);
+void free_mat(int** mat, int L);
+
+
+
+/*============= intsolver.c ==================*/
+
+    /*data ops*/
+int* Data_Process(int* vect, Lab* new_lab, FILE* fptr,int** mat);
+void vect_to_File(int* vect, char * nome_file_out);
+int teste_valid_mapa(int L_aux, int C_aux, int L1_aux, int C1_aux, char A_var, int var_aux, int L2_aux, int C2_aux, int P_aux);
+FILE* maior_mapa(FILE* fptr);
+    /*struct ops*/
+Lab* struct_insert (Lab* new_lab,
+		int L_aux,int C_aux, int L1_aux , int C1_aux, int L2_aux , int C2_aux,
+		char A_var, int var_aux, int P_aux);
+int* insere_resposta_vect(int* vect, int resposta);
+
+    /*solver*/
+int solver (Lab* new_lab, int** mat);
+int solver_1 (Lab* new_lab, int** mat);
+int solver_2 (Lab* new_lab, int** mat);
+int solver_3 (Lab* new_lab, int** mat);
+int solver_4 (Lab* new_lab, int** mat);
+int solver_5 (Lab* new_lab, int** mat);
+int solver_6 (Lab* new_lab, int** mat);
+
+        /*aux*/
+FILE* maior_P(FILE* fptr, int* P_max);
+int hash_key(int L, int C, int C_dim);
+parede* struct_wall_insert(parede* new_wall, int l, int c, int val);
+        /*hash*/
+parede** walls_vect_init(parede** vect, int P_max);
+parede** hash_insert(parede** vect, parede* p, int idx);
+int hash_get(parede** vect, int idx, int L, int C);
+parede** hash_clear(parede** vect);
+/*so para teste*/
+void hash_print(parede** vect);
+
+void free_walls(parede** heap, int P);
+
+/*djisktra*/
+lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* lab);
+int get_weight (int L, int C, lab_info* lab);
+
+
+
+int get_weight_beta(int l,int c, lab_info* lab);
+lab_info* read_file_beta(lab_info* new);
+
+
 
 slot** init_slot_matrix(lab_info* lab);
-
-/* intsolver.c ------------------------------------- */
-
-
-
-
-/* djisktra.c ------------------------------------- */
-
-
-/* auxtools.c ------------------------------------- */
-void print_wall_vector(parede** wall_vect,lab_info* lab);
-void conceptual_matrix_printer(parede** wall, lab_info* lab);/*L*/
-lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
-int get_weight_beta(int l,int c, lab_info* lab); /*while */
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
-
+void conceptual_matrix_printer(lab_info* lab);
 
 #endif

@@ -1,47 +1,40 @@
 /*
-    nota: agora cada função vai ter 3 estados
-
-    ----Não Mexer - Nome ----       (quando a função estiver terminada e funcional) se quisermos alterar algo primeiro falar com o outro
-    ----Em progresso - Nome ---     (não funcional mas a trabalhar nela) tmb é para não mexer
-    ----Livre-----                  (trabalho por fazer não reclamado) 
-
-    NOTA extra: código só vai para o git se não houver seg faults !!
-
-    Nota extra extra: no main se mexer não é para mexer em funções que sejam NM ou EP do outro.
-
+	Library for auxilary functions
+	->open_file
+	->check_args 
+	->check_extension
 */
 #include "roap_lib.h"
 
-/*-----------------Não mexer - Vasco ----------------*/
-FILE* open_file(char** argv,int flag){
 
-    FILE *fp = NULL;
-
-	if(flag==2){
-		fp = fopen(argv[1], "r");
-		if (fp == NULL){
-        	/*printf("\n fatal error: file not found \n");*/
-			exit(0);
-		}
-	}
-
-	if(flag==1){
-		fp = fopen(argv[2], "r");
-		if (fp == NULL){
-        	/*printf("\n fatal error: file not found \n");*/
-			exit(0);
-		}
+FILE* open_file_in (char* filename){
+    
+    FILE *fp;  
+	fp = fopen(filename, "r");
+	if (fp == NULL){
+		printf("exit\n"); fflush(stdout);
+		exit(0);
 	}
 	return fp;
 }
 
-/*-------------------------------------------------Não mexer - Vasco --------------------*/
+FILE* open_file_out (char* filename){
+    
+    FILE *fp;
+
+	fp = fopen(filename, "w");
+	if (fp == NULL)
+		exit(0);
+
+	return fp;
+}
+
 int check_args(int argc, char**argv){ 
 
 	int flag;
 
 	if((argc<2)||(argc>=4)){
-        /*printf("\n fatal error:  arguments error ");*/
+
         exit(0);
     }
 
@@ -54,165 +47,265 @@ int check_args(int argc, char**argv){
 	return flag;
 }
 
-/*------------------------------------------Não mexer - Vasco ---------------------*/
-char* check_extension(char** argv, int fase_flag){
 
-	char* output_file = NULL; 
-	char* input_file = NULL;
-	char* check_in1 = NULL;
-	char ext_out[]= ".sol";
+void check_extension (char* filename, int fase_flag)
+{
+	char* check_ext;
 	char ext_out1[] = ".sol1";
+	char ext_out[]= ".sol";
 
-	if(fase_flag==1){
 
-		input_file=(char*)malloc(strlen(argv[2])+1);
-		output_file=(char*)malloc(strlen(argv[2])+1);
-		check_in1=(char*)malloc(4);
+	if (fase_flag==1)
+    	nome_file_out=(char*) malloc(strlen(filename)+strlen(ext_out1)+1);
+	
+	if (fase_flag==2)
+    	nome_file_out=(char*) malloc(strlen(filename)+strlen(ext_out)+1);
 
-		input_file = strtok(argv[2], ".");
-		check_in1 = strtok(NULL, ".");
+    strcpy(nome_file_out, filename);
+    strtok(nome_file_out, ".");
+    check_ext = strtok(NULL, ".");
 
-		if(strcmp(check_in1,"in1")!=0){
-        /*printf("\n fatal error: input file is not .in1 \n");*/
-        exit(0);
-		}
-
-		if (input_file == NULL) {
-        /*printf("\n fatal error: could not open file \n");*/
+	if (nome_file_out == NULL){
 		exit(0);
-    	}
-
-		strcpy(output_file,input_file);
-    	strcat(output_file,ext_out1);
 	}
-
-	if(fase_flag==2){
-
-		input_file=(char*)malloc(strlen(argv[1])+1);
-		output_file=(char*)malloc(strlen(argv[1])+1);
-		check_in1=(char*)malloc(4);
 		
-		input_file = strtok(argv[1], ".");
-		check_in1 = strtok(NULL, ".");
-
-		if(strcmp(check_in1,"in")!=0){
-        	/*printf("\n fatal error: input file is not .in \n");*/
+	if (fase_flag==1){
+    	if(strcmp(check_ext, "in1")!=0){
         	exit(0);
 		}
-
-		if (input_file == NULL) {
-        /*printf("\n fatal error: could not open file \n");*/
-		exit(0);
-    	}
-
-		strcpy(output_file,input_file);
-    	strcat(output_file,ext_out);
+		strcat(nome_file_out, ext_out1); 
 	}
-	return output_file;
+
+	if (fase_flag==2){
+    	if(strcmp(check_ext, "in")!=0){
+        	exit(0);
+		}
+		strcat(nome_file_out, ext_out); 
+	}
+
 }
 
-/*---------------Livre-----------*/
+/***********************************************************************/
+
+FILE* maior_P(FILE* fptr, int* P_max){
+
+    int i_P=0;
+	int P_aux;
+
+    while (((fscanf(fptr, "%*d %*d %*d %*d")) == 0)){;
+        if(fscanf(fptr,"%d", &P_aux)==1){
+			if (P_aux > *P_max){
+            	*P_max = P_aux;		
+			}
+			while (i_P<P_aux){
+                if((fscanf(fptr, "%*d %*d %*d"))==0)
+                    i_P++;                 
+            }
+            i_P=0;
+        }
+    }
+
+    rewind(fptr);
+    return fptr;
+}
+
+
+
 void write_to_file(char* nome_file_out){
 
-	FILE* fpOut = NULL;
+	FILE* fpOut;
 	fpOut= fopen(nome_file_out,"w");
 
 	fprintf(fpOut,"TEST");
 
 	fclose(fpOut);
-	/*free(fpOut);*/
+
 }
 
-/*----------------Não mexer - Vasco ----------*/
-int is_lab_valid(lab_info* new){
+/*
+	em vez de aramzenar respostas(que agora ja nao deve ser so um vetor de ints)
+	para imprimir no main, escrever logo aqui no ficheiro, para cada mapa
+*/
+lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* head){
 
-	if(new->L<1 || new->C<1 || new->P<0)
-	/* invalid map */
-		return -1;
+    
+    int lin, col, val;
+    int i_P;
+    int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
+	parede* new_wall;
+	lab_info* new;
+	int idx;
+
+	/*para teste*/
+	int custo;
 	
-	if(new->L_target<1 || new->C_target <1 || new->L_target > new->L || new->C_target> new->C)
-	/* target is out of bounds */
-		return 1;
-	
-	return 0;
-}
+	printf("in data\n"); fflush(stdout);
+	/*int (*hash_key_ptr)(int, int, int, int);
+	hash_key_ptr=&hash_key;*/
 
-/*--------------Em progresso-Vasco------------------*/
-int get_weight(int l, int c, lab_info* lab, parede** wall){
-	/* if branca returns 0
-	   if cinza returns val
-	   if preta returns -1 
-	   if out of bounds returns -3
-	   */
-	int b=wall[2]->c;
+    while (((a=fscanf(fptr, "%d %d %d %d %d", 
+                &L_aux, &C_aux, &L1_aux, &C1_aux,&P_aux)) == 5)){
 
-	if(l>lab->L || c>lab->C || l<1 || c<1)
-		return -3;
-
-	/*for(int i=0;i<(lab->P);i++){  <- seg fault in here 
-		if((wall[i]->l == l) && (wall[i]->c == c)){
-
-				return wall[i]->val;
-		}
-		if (wall[i]->c>c)
-			return 0;
-		if (wall[i]->l>l)
-			return 0;	
-	}*/
-	return 0;
-}
-
-
-/*Livre*/
-lab_info* read_file(FILE* fptr, lab_info* head){
-
-	lab_info* new = NULL;
-	parede** wall_vector = NULL;
-	int id = 0;
-	int a, l_aux,c_aux,lt_aux,ct_aux,p_aux,b;
-
-	while((a=fscanf(fptr," %d %d %d %d %d", &l_aux,&c_aux,&lt_aux,&ct_aux,&p_aux)==5)){
-		
-		id ++;
 		new = malloc(sizeof(lab_info));
-		new->id=id;
-		new->L=l_aux;
-		new->C=c_aux;
-		new->L_target=lt_aux;
-		new->C_target=ct_aux;
-		new->P=p_aux;
+		new->L=L_aux;
+		new->C=C_aux;
+		new->L_target=L1_aux;
+		new->C_target=C1_aux;
+		new->P=P_aux;
 
-		if((b=is_lab_valid(new))==-1) /* invalid map */
-		{
-			new->B = -2; /*prob -1*/
-		}
-		if(b==1) /* out of bounds */
-		{
-			new->B = -1;
-		}
-		if (b==0)
-		{
-			wall_vector=init_wall_vect(wall_vector,new);
-			//print_wall_vector(wall_vector,new);
+        a=teste_valid_mapa(L_aux, C_aux, L1_aux, C1_aux, 'A', 1, 0, 0, P_aux);
 
-			/*for(int j=1;j>=new->P;j++)
-			{
-				int lp,cp,vp,c;
-				if ((c= fscanf(fptr,"%d %d %d",&lp,&cp,&vp))==3){
+        if(a!=0){
+            /*situação mapa inválido*/
+            if (a==-3)
+                exit(0);
 
-					if(is_wall_valid(lp,cp,vp)==0)
-					{
-						wall_vector[lp]=insert_col(lp,cp,vp,wall_vector,new);
-					}
-				}
+            while (i_P<P_aux){ /* salta o resto da leitura do mapa*/
+                if((fscanf(fptr, "%*d %*d %*d"))==0)
+                    i_P++;
+            }  
+            i_P=0;
+        }
 
-			}*/
+        else{
+            //mapa válido 
+            while (i_P<P_aux){
+                if(fscanf(fptr,"%d %d %d", &lin, &col, &val)==3){
+                    if(((lin>=0)&&(lin<=L_aux)&&(col>=0)&&(col<=C_aux)) && ((val>0) || (val=-1))){
+						new_wall=struct_wall_insert(new_wall, lin, col, val);
+						idx = hash_key(lin, col, C_aux);
+                        walls = hash_insert(walls, new_wall, idx);
+                    }
+                    i_P++;                    
+                }
+            }  
+            i_P=0;
+	    }
+		/*hash_print(walls);*/
+		printf("\n L %d C %d P %d \n ", new->L, new->C,new->P);
+		printf("\n l %d c %d \n", lin,col);
+		custo=get_weight(lin, col,new);
+		printf("custo: %d\n\n", custo);
 
+		/*??=dijsktra(walls, L_aux, C_aux);*/
+		/* insere resolvido na lista */ 
+
+		walls=hash_clear(walls);
+    }
+    return head;
+}
+
+
+
+parede** walls_vect_init(parede** vect, int P_max)
+{	
+	/*aloca com tamnaho P do maior mapa pela mesma razão do intermédio 
+	e porque todas as outras hash beneficiam, quanto mais pequeno for o seu mapa*/
+
+	/*continua-se a considerar o fator de compensação (80%, a ajustar) para o maior mapa*/
+	hash_size=P_max/0.8; 
+	vect = (parede**) malloc(hash_size*sizeof(parede*));
+	hash_clear(vect);
+
+	return vect;
+}
+
+
+parede** hash_insert(parede** vect, parede* p, int idx)
+{
+
+	/*se o slot dado por key(idx) estiver vazio, inserir*/
+	if(vect[idx]==NULL){
+		vect[idx]=p;
+	}
+		
+
+	else{
+		/*se nao, procura linear, de salto 1*/
+		while(vect[idx]!=NULL){
+			if(vect[idx]==NULL)
+				vect[idx]=p;	
+
+			idx++;
+			if (idx>=hash_size)
+				/*dar a volta*/
+				idx=0;
 		}
 	}
-	printf("alive");
-	return new;
-
+	return vect;
 }
 
 
+int hash_get(parede** vect, int idx, int L, int C)
+{
+	if (vect[idx]==NULL)
+		return 0;
+
+	if((vect[idx]->L==L) && (vect[idx]->C==C))
+		return vect[idx]->custo;
+
+	else{
+		/*se nao, procura linear, de salto 1*/
+		while((vect[idx]==NULL) || (vect[idx]->L!=L) || (vect[idx]->C!=C)){	
+			if (vect[idx]==NULL)
+				return 0;
+			
+			if((vect[idx]->L==L) && (vect[idx]->C==C))
+				return vect[idx]->custo;
+			idx++;
+			if (idx>=hash_size)
+				/*dar a volta*/
+				idx=0;
+		}
+		return vect[idx]->custo;
+	}
+	return 0;
+}
+
+
+parede** hash_clear(parede** vect)
+{
+	int i;
+
+	for(i=0; i<hash_size; i++){
+		vect[i]=NULL;
+	}
+	return vect;
+}
+
+
+int hash_key(int L, int C, int C_dim)
+{
+	int key, idx;
+
+	key=L*C_dim+C;
+	idx=key%hash_size;
+
+	return idx;
+}
+
+
+int get_weight (int L, int C, lab_info* lab)
+{
+	if(L>lab->L || C>lab->C || L<1 || C<1)
+		return -2; /*out of bounds*/
+
+	int idx;
+
+	idx=hash_key(L, C, C_aux);
+
+	return hash_get(walls, idx, L, C);
+}
+
+
+
+parede* struct_wall_insert(parede* new_wall, int l, int c, int val)
+{
+	new_wall= (parede*) malloc(sizeof(parede));
+
+	new_wall->L=l;
+	new_wall->C=c;
+	new_wall->custo=val;
+
+	return new_wall;
+}
