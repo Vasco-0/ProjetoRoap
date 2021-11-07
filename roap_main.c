@@ -36,7 +36,7 @@ int main(int argc, char**argv){
     //printf("read file door");
     //-> seg fault read_file(fptr,head);
 
-    //read_file_beta(head);
+    head=read_file_beta(head);
 
     printf("\nOK\n");
 

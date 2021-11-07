@@ -5,12 +5,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-    aqui da mesma forma as estruturas e cabeçalhos vão ter as mesmas 3 designações
-    NM - nome
-    EP - nome
-    L
-*/
+#define INFINITY 9999
+
+typedef struct coord{
+
+    int l;
+    int c;
+    
+}coord;
+
+typedef struct slot{
+
+    int w;
+    coord* position;
+
+}slot;
+
+typedef struct minHeap{
+
+    int size;
+
+    coord** minHeap_array;
+
+}minHeap;
+
+
 
 /*NM - Vasco*/
 typedef struct lab_info{
@@ -58,7 +77,7 @@ parede** init_wall_vect(parede** wall_vector,lab_info* new);
 
 lab_info* solve(lab_info* lab, parede** wall);/*EP - Vasco*/
 
-
+slot** init_slot_matrix(lab_info* lab);
 
 /* intsolver.c ------------------------------------- */
 
@@ -72,5 +91,8 @@ lab_info* solve(lab_info* lab, parede** wall);/*EP - Vasco*/
 void print_wall_vector(parede** wall_vect,lab_info* lab);
 void conceptual_matrix_printer(parede** wall, lab_info* lab);/*L*/
 lab_info* read_file_beta(lab_info* lab);/*EP-Vasco*/
+int get_weight_beta(int l,int c, lab_info* lab); /*while */
+void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
+
 
 #endif

@@ -13,3 +13,40 @@
 
 #include "roap_lib.h"
 
+
+slot** init_slot_matrix(lab_info* lab)
+{
+
+	slot** slot_matrix = (slot**)malloc(((lab->L)+1)*sizeof(slot*));
+
+	for(int i=0; i<((lab->C)+1) ;i++)
+	{
+		slot_matrix[i]=(slot*)malloc(sizeof(slot));
+	}
+	printf("%d",lab->L);
+	for(int j=0; j<(lab->L); j++){
+
+		for(int k=0;k<(lab->C); k++){
+			slot_matrix[j][k].w=INFINITY;
+		}
+	}
+
+	return slot_matrix;
+}
+
+/*void swap(coord** a, coord** b)
+{
+	coord **aux = **a;
+	**a = **b;
+	**b = **aux;
+}*/
+
+void minHeap_update( ){
+
+
+}
+
+void dijsktra(){
+
+	
+}
