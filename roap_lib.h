@@ -6,25 +6,33 @@
 #include <string.h>
 #include <limits.h>
 
-typedef struct coord{
+typedef struct coord_parent{
 
     int l;
     int c;
     
-}coord;
+}coord_parent;
+
+typedef struct coord_minH{
+
+    int l;
+    int c;
+    int cost;
+    
+}coord_minH;
 
 typedef struct slot{
 
     int w;
-    coord* position;
+    coord_parent* position;
 
 }slot;
 
 typedef struct minHeap{
 
-    int size;
+    int size; /*LxC*/
 
-    coord** minHeap_array;
+    coord_minH* minHeap_array;
 
 }minHeap;
 
