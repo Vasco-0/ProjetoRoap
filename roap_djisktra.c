@@ -41,12 +41,43 @@ slot** init_slot_matrix(lab_info* lab)
 	**b = **aux;
 }*/
 
-void minHeap_update( ){
+void dijsktra(lab_info* lab){
 
-
-}
-
-void dijsktra(){
+	int l_cursor, c_cursor;
+	restart_PQ(lab);
+	
 
 	
+	
+}
+
+void restart_PQ(lab_info* lab){
+
+	int size_of_new = (lab->L)*(lab->C);
+
+	PQ.size=size_of_new;
+
+	for(int i=0;i<size_of_new;i++)
+	{
+		PQ.minHeap_array[i]->cost=INF;
+	}
+}
+
+int isEmpty(){
+	return PQ.size == 0;
+}
+
+int is_neighbour_valid(int l, int c){
+	/*inside map*/
+	/*is in minH ? no ? PQ_find -> not valid*/
+	/*get_weight = black -> not valid*/
+	/*get_weight = cinza -> slot parent cinza ? not valid*/
+	/*returns weight or zero or -2 if invalid neighbour*/ 
+	}
+
+void explore_neighbours(slot** slot_matrix, int l, int c){
+	
+	/*check all directions */
+	/* 3 x is neighbour valid -> comparação de weights -> PQ_update or not  */
+
 }

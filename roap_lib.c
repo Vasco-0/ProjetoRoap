@@ -85,8 +85,6 @@ void check_extension (char* filename, int fase_flag)
 
 }
 
-/***********************************************************************/
-
 FILE* maior_P(FILE* fptr, int* P_max){
 
     int i_P=0;
@@ -122,10 +120,7 @@ void write_to_file(char* nome_file_out){
 
 }
 
-/*
-	em vez de aramzenar respostas(que agora ja nao deve ser so um vetor de ints)
-	para imprimir no main, escrever logo aqui no ficheiro, para cada mapa
-*/
+
 lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* head){
 
     
@@ -309,3 +304,14 @@ parede* struct_wall_insert(parede* new_wall, int l, int c, int val)
 
 	return new_wall;
 }
+
+void PQ_init(int V)
+{
+	PQ.minHeap_array= (minHnode**) malloc(V*sizeof(minHnode*));
+	PQ.size=V;
+}
+
+void PQ_delete_max();
+void PQ_update(minHnode* vrt);
+void fixup(minHnode** heap, int idx);
+void fixdown(minHnode** heap, int idx, int N);

@@ -19,6 +19,7 @@ int main(int argc, char**argv){
 
     /*vars final*/
     int P_max=0;
+    int V;
 
 
     fase_flag = check_args(argc, argv);
@@ -57,6 +58,7 @@ int main(int argc, char**argv){
         walls=walls_vect_init(walls, P_max);
                 printf("hash size: %d\n", hash_size);
 
+        PQ_init(V);
         head = Data_Process_final(fptr, walls,head);
 
         /*

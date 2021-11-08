@@ -26,7 +26,6 @@ void conceptual_matrix_printer(lab_info* lab){
 
 }
 
-
 int get_weight_beta(int l,int c, lab_info* lab){
 
 	if(l>lab->L || c>lab->C || l<1 || c<1)
@@ -54,8 +53,6 @@ int get_weight_beta(int l,int c, lab_info* lab){
 	return 0;
 
 }
-
-
 
 /*Em progresso - Vasco - nota: enquanto o read file não está pronto posso ir testando o algoritmo*/
 lab_info* read_file_beta(lab_info* new){

@@ -6,33 +6,30 @@
 #include <string.h>
 #include <limits.h>
 
-typedef struct coord_parent{
-
+typedef struct coord{ /*mesma função de um node name num grafo*/
     int l;
     int c;
     
-}coord_parent;
+}coord;
 
-typedef struct coord_minH{
+typedef struct minHnode{
 
-    int l;
-    int c;
+    coord coord_node;
     int cost;
     
-}coord_minH;
+}minHnode;
 
 typedef struct slot{
-
     int w;
-    coord_parent* position;
+    coord parent_position;
 
 }slot;
 
 typedef struct minHeap{
 
-    int size; /*LxC*/
+    int size; /*LxC quando iniciado*/
 
-    coord_minH* minHeap_array;
+    minHnode** minHeap_array; /*double pointer para facilidade de rearranjar array*/
 
 }minHeap;
 
@@ -86,7 +83,7 @@ int C_aux;
 int* st;
 int* wt;
 parede** walls;
-
+minHeap PQ;
 
 
 /*  inf->custo "infinito"
@@ -99,12 +96,37 @@ FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
 void check_extension(char* filename, int fase_flag);
 void write_to_file(char* nome_file_out);
+lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* lab);
 
-int** mat_alloc(int** mat, int L, int C);
-int* vect_alloc(int* vect, int size);
-void free_mat(int** mat, int L);
+/*aux*/
+FILE* maior_P(FILE* fptr, int* P_max);
+
+/*hash*/
+parede** walls_vect_init(parede** vect, int P_max);
+parede** hash_insert(parede** vect, parede* p, int idx);
+int hash_get(parede** vect, int idx, int L, int C);
+parede** hash_clear(parede** vect);
+int hash_key(int L, int C, int C_dim);
+parede* struct_wall_insert(parede* new_wall, int l, int c, int val);
+void free_walls(parede** heap, int P);
+/*so para teste*/
 
 
+/*djisktra*/
+void dijsktra(lab_info* lab);
+int get_weight (int L, int C, lab_info* lab);
+slot** init_slot_matrix(lab_info* lab);
+int isEmpty();
+int is_neighbour_valid();
+
+
+void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
+void conceptual_matrix_printer(lab_info* lab);
+void hash_print(parede** vect);
+
+void PQ_find(int l,int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
+void PQ_pop();/*pop do valor do topo da queue*/
+void PQ_update_cost();/*recebe novo peso para o (l,c)*/
 
 /*============= intsolver.c ==================*/
 
@@ -118,7 +140,6 @@ Lab* struct_insert (Lab* new_lab,
 		int L_aux,int C_aux, int L1_aux , int C1_aux, int L2_aux , int C2_aux,
 		char A_var, int var_aux, int P_aux);
 int* insere_resposta_vect(int* vect, int resposta);
-
     /*solver*/
 int solver (Lab* new_lab, int** mat);
 int solver_1 (Lab* new_lab, int** mat);
@@ -128,33 +149,9 @@ int solver_4 (Lab* new_lab, int** mat);
 int solver_5 (Lab* new_lab, int** mat);
 int solver_6 (Lab* new_lab, int** mat);
 
-        /*aux*/
-FILE* maior_P(FILE* fptr, int* P_max);
-int hash_key(int L, int C, int C_dim);
-parede* struct_wall_insert(parede* new_wall, int l, int c, int val);
-        /*hash*/
-parede** walls_vect_init(parede** vect, int P_max);
-parede** hash_insert(parede** vect, parede* p, int idx);
-int hash_get(parede** vect, int idx, int L, int C);
-parede** hash_clear(parede** vect);
-/*so para teste*/
-void hash_print(parede** vect);
 
-void free_walls(parede** heap, int P);
-
-/*djisktra*/
-lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* lab);
-int get_weight (int L, int C, lab_info* lab);
-
-
-
-int get_weight_beta(int l,int c, lab_info* lab);
-lab_info* read_file_beta(lab_info* new);
-
-
-
-slot** init_slot_matrix(lab_info* lab);
-void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
-void conceptual_matrix_printer(lab_info* lab);
-
+int** mat_alloc(int** mat, int L, int C);
+int* vect_alloc(int* vect, int size);
+void free_mat(int** mat, int L);
+/**/
 #endif
