@@ -7,8 +7,11 @@
 int main(int argc, char**argv){
     
     FILE* fptr;
-    nome_file_out = NULL;
+    
+    char* nome_file_out=NULL;
     int fase_flag;
+    int C_max;
+    int L_max;
 
     /*vars inter*/
     lab_info* head= NULL;
@@ -18,23 +21,24 @@ int main(int argc, char**argv){
     vect_insert_pos=0;
 
     /*vars final*/
-    int P_max=0;
+    int P_max;
     int V;
     minHeap* PQ=NULL;
+    parede** walls;
 
 
     fase_flag = check_args(argc, argv);
     /*flag 1-> inter, flag 2-> final*/
 
     if(fase_flag==1){
-        check_extension (argv[2], fase_flag);
+        nome_file_out = check_extension (nome_file_out, argv[2], fase_flag);
         fptr = open_file_in(argv[2]);
         /*  
             main inter
                 ->    
                 *(solver: falta A6)*  
         */
-        fptr = maior_mapa (fptr); 
+        fptr = maior_mapa (fptr, &L_max, &C_max, &P_max, fase_flag); 
         respostas = vect_alloc (respostas, N_mapas);
 	    mat = mat_alloc (mat, L_max+2, C_max+2);
 
@@ -49,17 +53,18 @@ int main(int argc, char**argv){
 
 
     if(fase_flag==2){
-        check_extension (argv[1], fase_flag);
+        check_extension (nome_file_out, argv[1], fase_flag);
         fptr = open_file_in(argv[1]);
         /*  
             main final
                 ->      
         */
-        fptr = maior_P (fptr, &P_max);             
+        fptr = maior_mapa (fptr, &L_max, &C_max, &P_max, fase_flag);
+        V=(C_max)*(L_max);   
+printf("V: %d\n", V); fflush(stdout);
         walls=walls_vect_init(walls, P_max);
-                printf("hash size: %d\n", hash_size);
 
-        PQ=PQ_init(V);
+        PQ=PQ_init(PQ, V);
         head = Data_Process_final(fptr, walls,head);
 
         /*

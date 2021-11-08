@@ -62,20 +62,11 @@ typedef struct parede
 } parede;
 
 
-
-char* nome_file_out;
-
-int C_max;
-int L_max;
 int N_mapas;
 int vect_insert_pos;
 
-/*vars final*/
 int hash_size;
 int C_aux;
-int* st;
-int* wt;
-parede** walls;
 
 
 /*  inf->custo "infinito"
@@ -86,12 +77,11 @@ parede** walls;
 FILE* open_file_in(char* filename);
 FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
-void check_extension(char* filename, int fase_flag);
+char* check_extension (char* nome_file_out, char* filename, int fase_flag);
 void write_to_file(char* nome_file_out);
 lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* lab);
 
-/*aux*/
-FILE* maior_P(FILE* fptr, int* P_max);
+FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag);
 
 /*hash*/
 parede** walls_vect_init(parede** vect, int P_max);
@@ -99,24 +89,25 @@ parede** hash_insert(parede** vect, parede* p, int idx);
 int hash_get(parede** vect, int idx, int L, int C);
 parede** hash_clear(parede** vect);
 int hash_key(int L, int C, int C_dim);
-parede* struct_wall_insert(parede* new_wall, int l, int c, int val);
+parede* struct_wall_init(parede* new_wall, int l, int c, int val);
 void free_walls(parede** heap, int P);
 /*so para teste*/
 
 
 /*djisktra*/
-void dijsktra(lab_info* lab);
-int get_weight (int L, int C, lab_info* lab);
+void dijsktra(parede** walls, lab_info* lab);
+int get_weight (parede** walls, int L, int C, lab_info* lab);
 slot** init_slot_matrix(lab_info* lab);
 int isEmpty();
 int is_neighbour_valid();
 
 
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
-void conceptual_matrix_printer(lab_info* lab);
+void conceptual_matrix_printer(parede** walls, lab_info* lab);
 void hash_print(parede** vect);
 
-coord* PQ_find(); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
+minHeap* PQ_init(minHeap* PQ, int V);
+coord* PQ_find(int l, int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
 void PQ_pop();/*pop do valor do topo da queue*/
 void PQ_update_cost();/*recebe novo peso para o (l,c)*/
 
@@ -130,7 +121,6 @@ int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix);
 int* Data_Process(int* vect, Lab* new_lab, FILE* fptr,int** mat);
 void vect_to_File(int* vect, char * nome_file_out);
 int teste_valid_mapa(int L_aux, int C_aux, int L1_aux, int C1_aux, char A_var, int var_aux, int L2_aux, int C2_aux, int P_aux);
-FILE* maior_mapa(FILE* fptr);
     /*struct ops*/
 Lab* struct_insert (Lab* new_lab,
 		int L_aux,int C_aux, int L1_aux , int C1_aux, int L2_aux , int C2_aux,
