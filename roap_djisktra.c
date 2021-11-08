@@ -34,7 +34,7 @@ slot** init_slot_matrix(lab_info* lab)
 	return slot_matrix;
 }
 
-void dijsktra(lab_info* lab){
+void dijsktra(parede** walls, lab_info* lab){
 
 	int rn, ln, dn, un;  /*right left down and up neighbours*/
 
@@ -57,7 +57,7 @@ int isEmpty(minHeap* PQ){
 	return PQ->size == 0;
 }
 
-int is_neighbour_valid(int ln, int cn,slot** slot_matrix,lab_info* lab){
+int is_neighbour_valid(parede** walls, int ln, int cn,slot** slot_matrix,lab_info* lab){
 	/*inside map*/
 	int b;
 
@@ -67,7 +67,7 @@ int is_neighbour_valid(int ln, int cn,slot** slot_matrix,lab_info* lab){
 	if(PQ_find(ln,cn)!=1) /*if it isnt in PQ is not valid*/
 		return -1;
 		
-	int a = get_weight(ln,cn,lab);
+	int a = get_weight(walls, ln, cn, lab);
 
 	if(a==-1){ /*casa preta*/
 		return -1;
@@ -76,7 +76,7 @@ int is_neighbour_valid(int ln, int cn,slot** slot_matrix,lab_info* lab){
 	int lp = slot_matrix[ln][cn].parent_position.l; /*não pode vir de casa cinza*/
 	int cp = slot_matrix[ln][cn].parent_position.l;
 
-	b=get_weight(lp,cp,lab); /*peso do pai*/
+	b=get_weight(walls, lp, cp, lab); /*peso do pai*/
 
 	if(a>0) /*if casa cinza*/
 	{

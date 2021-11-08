@@ -12,24 +12,25 @@ void print_slot_matrix_w(slot** slot_matrix,lab_info* lab){
 }
 
 /*-------------Livre ---------------*/
-void conceptual_matrix_printer(lab_info* lab){
+void conceptual_matrix_printer(parede** walls, lab_info* lab){
 /* for debug purposes only - Not working*/
 
 	int i,j;
 
 	for(i=1;i<lab->L;i++){
 		for(j=1;j<lab->C;j++){
-			printf("%d",get_weight(i,j,lab));
+			printf("%d",get_weight(walls, i,j,lab));
 		}
 		printf("\n");
 	}
 
 }
 
+/*
 int get_weight_beta(int l,int c, lab_info* lab){
 
 	if(l>lab->L || c>lab->C || l<1 || c<1)
-		return -2; /*out of bounds*/
+		return -2; *//*out of bounds*//*
 	if((l=1) && (c==3)) 				
 		return 10;
 	if((l=2) && (c==2))
@@ -53,6 +54,7 @@ int get_weight_beta(int l,int c, lab_info* lab){
 	return 0;
 
 }
+*/
 
 /*Em progresso - Vasco - nota: enquanto o read file não está pronto posso ir testando o algoritmo*/
 lab_info* read_file_beta(lab_info* new){

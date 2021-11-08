@@ -106,45 +106,6 @@ int teste_valid_mapa(int L_aux,int C_aux, int L1_aux , int C1_aux, char A_var, i
 
 
 
-/***********************************************************************/
-FILE* maior_mapa(FILE* fptr){
-
-    int i_P=0;
-
-    int a, L_aux_m, C_aux_m, L1_aux_m, C1_aux_m, var_aux_m, P_aux_m;
-    int L2_aux, C2_aux;
-    char A_var_m;
-
-    int lm, cm, vm;
-
-    N_mapas=0;
-
-    while (((a=fscanf(fptr, "%d %d %d %d %c%d", 
-                &L_aux_m, &C_aux_m, &L1_aux_m, &C1_aux_m, &A_var_m, &var_aux_m)) == 6) 
-                && (A_var_m=='A')){
-
-        if(var_aux_m==6)
-            a=fscanf(fptr,"%d %d",&L2_aux,&C2_aux);
-
-        a=fscanf(fptr,"%d",&P_aux_m);
-
-        if (C_aux_m > C_max)
-                C_max = C_aux_m;
-
-        if (L_aux_m > L_max)
-                L_max = L_aux_m;
-
-        while (i_P<P_aux_m){
-            if((fscanf(fptr, "%d %d %d", &lm, &cm, &vm))==3)
-                i_P++;                 
-        }
-
-        i_P=0;
-        N_mapas++;
-    }
-    rewind(fptr);
-    return fptr;
-}
 
 /***********************************************************************/
 Lab* struct_insert (Lab* new_lab,
