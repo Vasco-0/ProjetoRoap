@@ -1,13 +1,4 @@
 /*
-    nota: agora cada função vai ter 3 estados
-
-    ----Não Mexer - Nome ----       (quando a função estiver terminada e funcional) se quisermos alterar algo primeiro falar com o outro
-    ----Em progresso - Nome ---     (não funcional mas a trabalhar nela) tmb é para não mexer
-    ----Livre-----                  (trabalho por fazer não reclamado) 
-
-    NOTA extra: código só vai para o git se não houver seg faults !!
-
-    Nota extra extra: no main se mexer não é para mexer em funções que sejam NM ou EP do outro.
 
 */
 
@@ -34,9 +25,15 @@ slot** init_slot_matrix(lab_info* lab)
 	return slot_matrix;
 }
 
-void dijsktra(parede** walls, lab_info* lab){
+void dijsktra(parede** walls, lab_info* lab, minHeap* PQ){
 
 	int rn, ln, dn, un;  /*right left down and up neighbours*/
+
+	PQ = restart_PQ(lab,PQ);
+
+	int rn, ln, dn, un;  /*right left down and up neighbours*/
+
+	
 
 	slot** slot_matrix = init_slot_matrix(lab);
 
@@ -45,12 +42,13 @@ void dijsktra(parede** walls, lab_info* lab){
 	
 }
 
-void restart_PQ(lab_info* lab,minHeap* PQ){
+minHeap* restart_PQ(lab_info* lab,minHeap* PQ){
 
 	int size_of_new = (lab->L)*(lab->C);
- /* meter por ordem de adjacentes*/
+ 	/*TO DO meter por ordem de adjacentes*/
 	PQ->size=size_of_new;
 
+	return PQ;
 }
 
 int isEmpty(minHeap* PQ){
