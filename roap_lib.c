@@ -182,7 +182,7 @@ lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* head){
 		custo=get_weight(lin, col,new);
 		printf("custo: %d\n\n", custo);
 
-		/*??=dijsktra(walls, L_aux, C_aux);*/
+		void dijsktra(new);
 		/* insere resolvido na lista */ 
 
 		walls=hash_clear(walls);
@@ -305,13 +305,83 @@ parede* struct_wall_insert(parede* new_wall, int l, int c, int val)
 	return new_wall;
 }
 
-void PQ_init(int V)
+minHeap* PQ_init(minHeap* PQ, int V)
 {
-	PQ.minHeap_array= (minHnode**) malloc(V*sizeof(minHnode*));
-	PQ.size=V;
+	int i;
+	PQ = (minHeap*)malloc(sizeof(minHeap));
+	PQ->minHeap_array = (coord**) malloc(V*sizeof(coord*));
+	for(i=0; i<V;i++){
+		PQ->minHeap_array[i] = (coord*) malloc(sizeof(coord));
+	}
+	PQ->size=V;
 }
 
-void PQ_delete_max();
-void PQ_update(minHnode* vrt);
-void fixup(minHnode** heap, int idx);
-void fixdown(minHnode** heap, int idx, int N);
+void PQ_delete_max(minHeap* PQ)
+{
+	PQ->minHeap_array[0]=NULL;
+	PQ->size--;
+	PQ_resort();
+}
+
+coord* PQ_find(int l, int c) /*recebe coordenada e vê se está no PQ*/
+{
+
+}
+
+
+minHeap* PQ_update(minHeap* PQ,slot** slot_matrix, int l, int c) /*receber coordenada que recebeu atualização (menor custo) e reordena heap*/
+{
+	int i;
+	int a; 
+
+	for(i=0; i<PQ->size;i++){
+		if((l==PQ->minHeap_array[i]->l) && (c==PQ->minHeap_array[i]->c)){
+			
+		while(a=less_pri(i, (i-1)/2,PQ,slot_matrix) == 1)
+		{
+		PQ = exch(i, (i-1)/2 ,PQ);
+		PQ = fixup(i,PQ,slot_matrix);
+		i=(i-1)/2;
+		}
+			break;
+		}
+	}
+
+	return PQ;
+}
+
+
+int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix)
+{	
+	/*
+	para i=a,b:
+	mat_coord_l= heap[i].l
+	mat_coord_c= heap[i].c
+	custo= mat[mat_coord_l][mat_coord_c].w
+	=>if custo_a < custo_b...
+	*/
+	if(slot_matrix[PQ->minHeap_array[a]->l][PQ->minHeap_array[a]->c].w
+		> slot_matrix[PQ->minHeap_array[b]->l][PQ->minHeap_array[b]->c].w)
+		return 1;
+	else
+		return 0;
+}
+
+minHeap* exch(int a, int b,minHeap* PQ)
+{	
+	coord *aux;
+
+	aux=PQ->minHeap_array[a];
+	PQ->minHeap_array[a]=PQ->minHeap_array[b];
+	PQ->minHeap_array[b]=aux;
+
+}
+
+minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix)
+{
+	while(idx>0 && less_pri((idx-1)/2, idx,PQ,slot_matrix)==1){
+		exch(idx, (idx-1)/2,PQ);
+		idx=(idx-1)/2;
+	}
+}
+

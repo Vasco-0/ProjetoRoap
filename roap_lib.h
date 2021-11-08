@@ -12,13 +12,6 @@ typedef struct coord{ /*mesma função de um node name num grafo*/
     
 }coord;
 
-typedef struct minHnode{
-
-    coord coord_node;
-    int cost;
-    
-}minHnode;
-
 typedef struct slot{
     int w;
     coord parent_position;
@@ -29,7 +22,7 @@ typedef struct minHeap{
 
     int size; /*LxC quando iniciado*/
 
-    minHnode** minHeap_array; /*double pointer para facilidade de rearranjar array*/
+    coord** minHeap_array; /*double pointer para facilidade de rearranjar array*/
 
 }minHeap;
 
@@ -83,7 +76,6 @@ int C_aux;
 int* st;
 int* wt;
 parede** walls;
-minHeap PQ;
 
 
 /*  inf->custo "infinito"
@@ -124,9 +116,13 @@ void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
 void conceptual_matrix_printer(lab_info* lab);
 void hash_print(parede** vect);
 
-void PQ_find(int l,int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
+coord* PQ_find(); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
 void PQ_pop();/*pop do valor do topo da queue*/
 void PQ_update_cost();/*recebe novo peso para o (l,c)*/
+
+minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
+minHeap* exch(int a, int b,minHeap* PQ);
+int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix);
 
 /*============= intsolver.c ==================*/
 
