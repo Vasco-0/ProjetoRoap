@@ -18,6 +18,15 @@ typedef struct slot{
 
 }slot;
 
+typedef struct traceback{
+
+    int flag_found;
+    int steps; /*size of path */
+    int total_cost;
+    coord* path;
+
+}traceback;
+
 typedef struct minHeap{
 
     int size; /*LxC quando iniciado*/
@@ -91,30 +100,34 @@ parede** hash_clear(parede** vect);
 int hash_key(int L, int C, int C_dim);
 parede* struct_wall_init(parede* new_wall, int l, int c, int val);
 void free_walls(parede** heap, int P);
-/*so para teste*/
-
 
 /*djisktra*/
-void dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
+traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
 int get_weight (parede** walls, int L, int C, lab_info* lab);
 slot** init_slot_matrix(lab_info* lab);
-int isEmpty();
-int is_neighbour_valid();
+int isEmpty(minHeap* PQ);
+int is_neighbour_valid(parede** walls, coord* v,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
+int isTarget(coord* u,lab_info* lab);
+traceback* tracebackaroni(slot** slot_matrix,traceback* final_path);
+traceback* init_trace(traceback* final_path,int step_count,int found_flag);
 
-
+/*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
 void conceptual_matrix_printer(parede** walls, lab_info* lab);
 void hash_print(parede** vect);
 
+/*PQ*/
 minHeap* PQ_init(minHeap* PQ, int V);
 coord* PQ_find(int l, int c,minHeap* PQ); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
 coord* PQ_pop(minHeap* PQ);/*pop do valor do topo da queue*/
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ);
 minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c);
-
 minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
 minHeap* exch(int a, int b,minHeap* PQ);
 int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix);
+
+
+
 
 /*============= intsolver.c ==================*/
 
