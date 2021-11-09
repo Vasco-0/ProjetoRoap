@@ -364,14 +364,14 @@ minHeap* PQ_init(minHeap* PQ, int V)
 	return PQ;
 }
 
-void PQ_delete_max(minHeap* PQ)
+coord* PQ_pop(minHeap* PQ)
 {
 	PQ->minHeap_array[0]=NULL;
 	PQ->size--;
 	/*PQ_resort();*/
 }
 
-coord* PQ_find(int l, int c) /*recebe coordenada e vê se está no PQ*/
+coord* PQ_find(int l, int c,minHeap* PQ) /*recebe coordenada e vê se está no PQ*/
 {
 
 }

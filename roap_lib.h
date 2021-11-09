@@ -21,7 +21,7 @@ typedef struct slot{
 typedef struct minHeap{
 
     int size; /*LxC quando iniciado*/
-
+    int dim; /*always LxC*/
     coord** minHeap_array; /*double pointer para facilidade de rearranjar array*/
 
 }minHeap;
@@ -95,7 +95,7 @@ void free_walls(parede** heap, int P);
 
 
 /*djisktra*/
-void dijsktra(parede** walls, lab_info* lab);
+void dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
 int get_weight (parede** walls, int L, int C, lab_info* lab);
 slot** init_slot_matrix(lab_info* lab);
 int isEmpty();
@@ -107,9 +107,10 @@ void conceptual_matrix_printer(parede** walls, lab_info* lab);
 void hash_print(parede** vect);
 
 minHeap* PQ_init(minHeap* PQ, int V);
-coord* PQ_find(int l, int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
-void PQ_pop();/*pop do valor do topo da queue*/
-void PQ_update_cost();/*recebe novo peso para o (l,c)*/
+coord* PQ_find(int l, int c,minHeap* PQ); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
+coord* PQ_pop(minHeap* PQ);/*pop do valor do topo da queue*/
+minHeap* PQ_restart(lab_info* lab, minHeap* PQ);
+minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c);
 
 minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
 minHeap* exch(int a, int b,minHeap* PQ);
