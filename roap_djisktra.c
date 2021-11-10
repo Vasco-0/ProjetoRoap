@@ -40,6 +40,9 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	coord* u_pop = NULL;
 	slot** slot_matrix = NULL;
 
+	int l_previous;
+	int c_previous;
+
 	slot_matrix=init_slot_matrix(lab);
 	PQ = PQ_restart(lab,PQ);
 
@@ -59,9 +62,8 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 
 	while(!isEmpty(PQ))
 	{
-	
-		u_pop = PQ_pop(PQ,slot_matrix); 
-		printf("\n\n popped (%d,%d) ",u_pop->l,u_pop->c);
+		u_pop = PQ_pop(PQ,slot_matrix,u_pop); ;
+		printf("\n\n popped (%d,%d)",u_pop->l,u_pop->c);
 		
 		if(isTarget(u_pop,lab)==1)
 		{
@@ -182,7 +184,7 @@ int isEmpty(minHeap* PQ){
 }
 
 int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag){
-	
+
 	int atual_weight;
 	int neighbour_weight;
 	int next_neighbour_same_dir_w;
@@ -217,7 +219,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 			else
 			{/*crosses to not white*/
 				return-1;
-				printf("\n not valid crossing to %d %d",v->l,v->c);
+				printf("\n not valid crossing to (%d,%d)",v->l,v->c);
 			}
 		}
 		else /*not same direction when crossing*/
@@ -245,7 +247,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 			{
 				return neighbour_weight;
 			}else{
-				printf("\n not valid neighbour (%d,%d) cause next neighbour in same dir is not whit ", v->l,v->c);
+				printf("\n not valid neighbour (%d,%d) cause next neighbour in same dir is not white ", v->l,v->c);
 				return -1;
 			}
 		}
@@ -266,6 +268,7 @@ int isTarget(coord* u,lab_info* lab){
 
 traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* target)
 {
+	printf("\n____PATH");
 	int step_count = 1; /*to include starting point*/
 	int crawler_l = target->l;
 	int crawler_c = target->c;
