@@ -85,8 +85,8 @@ FILE* open_file_in(char* filename);
 FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
 char* check_extension (char* nome_file_out, char* filename, int fase_flag);
-void write_to_file(char* nome_file_out);
-lab_info* Data_Process_final(FILE* fptr,minHeap* PQ, parede** walls,lab_info* lab);
+void write_to_file(FILE* fptr,traceback* path);
+void Data_Process_final(FILE* fptr, FILE* fptr_out,minHeap* PQ, parede** walls);
 
 FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag);
 
@@ -97,7 +97,8 @@ int hash_get(parede** vect, int idx, int L, int C);
 parede** hash_clear(parede** vect);
 int hash_key(int L, int C, int C_dim);
 parede* struct_wall_init(parede* new_wall, int l, int c, int val);
-void free_walls(parede** heap, int P);
+void free_walls(parede** heap);
+void free_PQ(minHeap *PQ, int V);
 
 /*djisktra*/
 traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
@@ -107,8 +108,7 @@ int isEmpty(minHeap* PQ);
 int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
 int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab);
 int isTarget(coord* u,lab_info* lab);
-traceback* tracebackaroni(slot** slot_matrix,traceback* final_path);
-traceback* init_trace(traceback* final_path,int step_count,int found_flag);
+traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
 
 /*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
@@ -120,7 +120,7 @@ void PQ_print(minHeap* PQ, slot** slot_matix);
 /*PQ*/
 minHeap* PQ_init(minHeap* PQ, int V);
 int PQ_find(minHeap* PQ, int l,int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
-coord* PQ_pop(minHeap* PQ,slot** slo_matrix);/*pop do valor do topo da queue*/
+coord* PQ_pop(minHeap* PQ,slot** slo_matrix,coord* top);/*pop do valor do topo da queue*/
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ);
 minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c);
 minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);

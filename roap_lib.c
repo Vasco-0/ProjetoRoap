@@ -22,8 +22,10 @@ FILE* open_file_out (char* filename){
     FILE *fp;
 
 	fp = fopen(filename, "w");
-	if (fp == NULL)
+	if (fp == NULL){
+		printf("EXIT out\n"); fflush(stdout);
 		exit(0);
+	}
 
 	return fp;
 }
@@ -33,7 +35,6 @@ int check_args(int argc, char**argv){
 	int flag;
 
 	if((argc<2)||(argc>=4)){
-
         exit(0);
     }
 
@@ -156,35 +157,40 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-void write_to_file(char* nome_file_out){
+void write_to_file(FILE* fptr, traceback* traceback)
+{
+	int i;
 
-	FILE* fpOut;
-	fpOut= fopen(nome_file_out,"w");
-
-	fprintf(fpOut,"TEST");
-
-	fclose(fpOut);
-
+	fprintf(fptr,"%d\n", traceback->total_cost);
+	if(traceback->total_cost>0){
+		fprintf(fptr,"%d\n", traceback->steps);
+		for(i=traceback->steps; i>=0; i--){
+			fprintf(fptr,"%d %d %d", (traceback->path[i].L+1), traceback->path[i].C+1, traceback->path[i].custo);
+		}
+	}
 }
 
 
-lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* head){
+void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** walls){
 
     
     int lin, col, val;
     int i_P;
     int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
 	traceback* final_path = NULL;
-	parede* new_wall;
-	lab_info* new;
+	parede* new_wall=NULL;
+	lab_info* new=NULL;
 	int idx;
 
-    while (((a=fscanf(fptr, "%d %d %d %d %d", 
+	new = (lab_info*)malloc(sizeof(lab_info));
+	new_wall = (parede*)malloc(sizeof(parede));
+
+    while (((a=fscanf(fptr_in, "%d %d %d %d %d", 
                 &L_aux, &C_aux, &L1_aux, &C1_aux,&P_aux)) == 5)){
 
 		L1_aux=L1_aux-1;
 		C1_aux=C1_aux-1;
-		new = (lab_info*)malloc(sizeof(lab_info));
+
 		new->L=L_aux;
 		new->C=C_aux;
 		new->L_target=L1_aux;
@@ -199,7 +205,7 @@ lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* 
                 exit(0);
 
             while (i_P<P_aux){ /* salta o resto da leitura do mapa*/
-                if((fscanf(fptr, "%*d %*d %*d"))==0)
+                if((fscanf(fptr_in, "%*d %*d %*d"))==0)
                     i_P++;
             }  
             i_P=0;
@@ -208,7 +214,7 @@ lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* 
         else{
             //mapa válido 
             while (i_P<P_aux){
-                if(fscanf(fptr,"%d %d %d", &lin, &col, &val)==3){
+                if(fscanf(fptr_in,"%d %d %d", &lin, &col, &val)==3){
 					lin = lin-1;
 					col = col-1;
                     if(((lin>=0)&&(lin<L_aux)&&(col>=0)&&(col<C_aux)) && ((val>0) || (val=-1)))
@@ -216,7 +222,6 @@ lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* 
 						new_wall=struct_wall_init(new_wall, lin, col, val);
 						idx = hash_key(lin, col, C_aux);
                         walls = hash_insert(walls, new_wall, idx);
-						
                     }
                     i_P++;                    
                 }
@@ -227,12 +232,15 @@ lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* 
 		PQ_print(PQ, slot_matix);
         */   
 
-		final_path = dijsktra(walls, new,PQ);
-		/* insere resolvido na lista */ 
-
+		final_path = dijsktra(walls, new, PQ); 
+		/*write_to_file(fptr_out, final_path);*/
+		
 		walls=hash_clear(walls);
+		
     }
-    return head;
+	free(new);
+	free(new_wall);
+    return;
 }
 
 
@@ -340,8 +348,6 @@ int get_weight (parede** walls, int L, int C, lab_info* lab)
 
 parede* struct_wall_init(parede* new_wall, int l, int c, int val)
 {
-	new_wall= (parede*) malloc(sizeof(parede));
-
 	new_wall->L=l;
 	new_wall->C=c;
 	new_wall->custo=val;
@@ -366,39 +372,45 @@ minHeap* PQ_init(minHeap* PQ, int V)
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 {
 	int i, j, k=0;
-	/*int l, c,z;*/	
 	int size_of_new;
 
-	//printf("in restart, lab: %d %d\n", lab->L, lab->C); fflush(stdout);
+	printf("in restart, lab: %d %d\n", lab->L, lab->C); fflush(stdout);
 	size_of_new = (lab->L)*(lab->C);
 	PQ->size=size_of_new;
+	/*PQ->idx_vect=(int*)malloc(PQ->size*sizeof(int));*/
 
 	printf("L %d, C %d\n", lab->L, lab->C); fflush(stdout);
 	for(i=0; i<lab->L; i++){
 		for(j=0; j<lab->C; j++){
 			PQ->minHeap_array[k]->l=i;
 			PQ->minHeap_array[k]->c=j;
+			/*PQ->idx_vect[l*C_max+c]=k;*/
 			k++;
 		}
 	}
-	/*possivel otimização*/
+
 	/*
-	for(i=1; i<=lab->L; i++){
+	int l, c, z;
+	for(i=0; i<lab->L; i++){
 		l=i;
 		c=i;
-		PQ->minHeap_array[k]->l=i;
-		PQ->minHeap_array[k]->c=i;
+		PQ->minHeap_array[k]->l=l;
+		PQ->minHeap_array[k]->c=c;
 		k++;
-		for (j=l, z=c; j>1 || z>1; j++, z++){
+		printf("k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
+		for (j=l, z=c; j>=0 || z>=0; j--, z--){
 			PQ->minHeap_array[k]->l=l;
-			PQ->minHeap_array[k]->c=k--;
+			PQ->minHeap_array[k]->c=k-1;
 			k++;
-			PQ->minHeap_array[k]->l=j--;
+			printf("->k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
+			PQ->minHeap_array[k]->l=j-1;
 			PQ->minHeap_array[k]->c=c;	
 			k++;
+			printf("->k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
 		}
 	}
 	*/
+	
 	return PQ;
 }
 
@@ -418,9 +430,8 @@ minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c) /*receber coor
 }
 
 
-coord* PQ_pop(minHeap* PQ, slot** slot_matrix)
+coord* PQ_pop(minHeap* PQ, slot** slot_matrix, coord* top)
 {	
-	coord* top = (coord*)malloc(sizeof(coord));
 	//printf("in pop\n"); fflush(stdout);
 	top->l=PQ->minHeap_array[0]->l;
 	top->c=PQ->minHeap_array[0]->c;
@@ -543,5 +554,38 @@ minHeap* exch(int a, int b, minHeap* PQ)
 	PQ->minHeap_array[a]=PQ->minHeap_array[b];
 	PQ->minHeap_array[b]=aux;
 
+	
+	/*idx_vect: vetor de tamnaho V, cujos indices sao a celula 
+	(convertida para notação de vertice), que contem o indice atual da celula em heap*/
+	/*
+	int i_a=PQ->idx_vect->[PQ->minHeap_array[a]->l * C_max + PQ->minHeap_array[a]->c;
+	int i_b=PQ->idx_vect->[PQ->minHeap_array[b]->l * C_max + PQ->minHeap_array[b]->c]
+	int temp = i_a;
+	i_a=i_b;
+	i_b=temp;
+	*/
+
 	return PQ;
+}
+
+
+void free_walls(parede** heap)
+{
+	int i;
+	for(i=0; i<hash_size; i++){
+		free(heap[i]);
+	}
+	free(heap);
+}
+
+
+void free_PQ(minHeap *PQ, int V)
+{
+	int i;
+	for(i=0; i<V; i++){
+		free(PQ->minHeap_array[i]);
+	}
+	free(PQ->minHeap_array);
+	/*free(PQ->idx_vect);*/
+	free(PQ);
 }

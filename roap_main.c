@@ -6,7 +6,8 @@
 
 int main(int argc, char**argv){
     
-    FILE* fptr;
+    FILE* fptr_in=NULL;
+    FILE* fptr_out=NULL;
     
     char* nome_file_out=NULL;
     int fase_flag;
@@ -32,50 +33,49 @@ int main(int argc, char**argv){
 
     if(fase_flag==1){
         nome_file_out = check_extension (nome_file_out, argv[2], fase_flag);
-        fptr = open_file_in(argv[2]);
+        fptr_in = open_file_in(argv[2]);
         /*  
             main inter
                 ->    
                 *(solver: falta A6)*  
         */
-        fptr = maior_mapa (fptr, &L_max, &C_max, &P_max, fase_flag); 
+        fptr_in = maior_mapa (fptr_in, &L_max, &C_max, &P_max, fase_flag); 
         respostas = vect_alloc (respostas, N_mapas);
 	    mat = mat_alloc (mat, L_max+2, C_max+2);
 
-        respostas = Data_Process(respostas, new_lab, fptr, mat);
+        respostas = Data_Process(respostas, new_lab, fptr_in, mat);
         vect_to_File(respostas, nome_file_out); 
 
-        fclose(fptr);
+        fclose(fptr_in);
         free_mat(mat, L_max);
         free(respostas);
-        free (nome_file_out);
     }
 
 
     if(fase_flag==2){
-        check_extension (nome_file_out, argv[1], fase_flag);
-        fptr = open_file_in(argv[1]);
+        nome_file_out = check_extension (nome_file_out, argv[1], fase_flag);
+        fptr_in = open_file_in(argv[1]);
+        fptr_out = open_file_out(nome_file_out);
         /*  
             main final
                 ->      
         */
-        fptr = maior_mapa (fptr, &L_max, &C_max, &P_max, fase_flag);
+        fptr_in = maior_mapa (fptr_in, &L_max, &C_max, &P_max, fase_flag);
         V=(C_max)*(L_max);   
         /*printf("V: %d\n", V); fflush(stdout);*/
         walls=walls_vect_init(walls, P_max);
-
         PQ=PQ_init(PQ, V);
-        head = Data_Process_final(fptr, PQ, walls,head);
 
-        /*
-        free_walls(walls, hash_size);
-        free_PQ();
-        free(st);
-        free(wt);
-        */
+        Data_Process_final(fptr_in, fptr_out, PQ, walls);
+
+        free_walls(walls);
+        free_PQ(PQ, V);
+        /*free head;*/
+        
     }
-
-    /*write_to_file(nome_file_out);*/
+    free(nome_file_out);
+    fclose(fptr_in);
+    fclose(fptr_out);
 
     exit(0);
 }
