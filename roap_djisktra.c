@@ -61,7 +61,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	{
 	
 		u_pop = PQ_pop(PQ,slot_matrix); 
-		printf("\n popped (%d,%d) ",u_pop->l,u_pop->c);
+		printf("\n\n popped (%d,%d) ",u_pop->l,u_pop->c);
 		
 		if(isTarget(u_pop,lab)==1)
 		{
@@ -73,10 +73,10 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		//for right neighbour
 		v->l=u_pop->l;
 		v->c=u_pop->c+1;
-		//dir_flag=1;
-		if((cost_n = is_neighbour_valid(walls,v,slot_matrix,lab,PQ,dir_flag))>0)
+		dir_flag=1;
+		if((cost_n = is_neighbour_valid(walls,v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf(" / neighbour valid at (%d,%d) / \n",v->l,v->c);
+			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
@@ -92,10 +92,10 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		//for left neighbour
 		v->l=u_pop->l;
 		v->c=u_pop->c-1;
-		//dir_flag=2;
-		if((cost_n = is_neighbour_valid(walls,v,slot_matrix,lab,PQ,dir_flag))>0)
+		dir_flag=2;
+		if((cost_n = is_neighbour_valid(walls,v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf(" / neighbour valid at (%d,%d) / \n",v->l,v->c);
+			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w;
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
@@ -111,10 +111,10 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		//for down neighbour
 		v->l=u_pop->l +1;
 		v->c=u_pop->c;
-		//dir_flag=3;
-		if((cost_n = is_neighbour_valid(walls,v,slot_matrix,lab,PQ,dir_flag))>0)
+		dir_flag=3;
+		if((cost_n = is_neighbour_valid(walls,v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf(" / neighbour valid at (%d,%d) / \n",v->l,v->c);
+			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
@@ -130,10 +130,10 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		//for up neighbour
 		v->l=u_pop->l-1;
 		v->c=u_pop->c;
-		//dir_flag=4;
-		if((cost_n = is_neighbour_valid(walls,v,slot_matrix,lab,PQ,dir_flag))>0)
+		dir_flag=4;
+		if((cost_n = is_neighbour_valid(walls,v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf(" / neighbour valid at (%d,%d) / \n",v->l,v->c);
+			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
@@ -150,7 +150,9 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	
 	if(target_flag==1)
 	{
-		printf("\nTARGET HIT at %d %d\n",u_pop->l, u_pop->c);
+		int aux_l=slot_matrix[u_pop->l][u_pop->c].parent_position.l;
+		int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;
+		printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);
 		PQ_print(PQ,slot_matrix);
     	
 	}
@@ -174,65 +176,74 @@ int isEmpty(minHeap* PQ){
 	return PQ->size == 0;
 }
 
-int is_neighbour_valid(parede** walls, coord* v,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag){
+int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag){
 	
-	int b;
+	int atual_weight;
+	int neighbour_weight;
+	int next_neighbour_same_dir_w;
 
 	if((v->l>=lab->L) || (v->c>=lab->C) || (v->l<0) || (v->c<0)) /*is out */
 		return-1;
 
-	if(PQ_find(PQ,v->l,v->c)!=1)
+	if(PQ_find(PQ,v->l,v->c)!=1) /*is in PQ ?*/
 	{
-		printf("\n (%d ,%d ) is not in PQ\n",v->l,v->c);
+		printf("\n (%d ,%d ) is not in PQ",v->l,v->c);
 			return -1;
-	} /**/
-		
-	int a = get_weight(walls, v->l, v->c, lab);
-	printf(" weight of (%d, %d)->%d ", v->l , v->c, a);
+	} 
+	
+	atual_weight=get_weight(walls,atual->l,atual->c,lab);
 
-	if(a==-1){ /*parede preta */
-		return -1;
-	}
+	if (atual_weight>0)
+	{ /*crossing*/
+		int l_dir_atual_parent = atual->l - slot_matrix[atual->l][atual->c].parent_position.l;
+		int c_dir_atual_parent = atual->c - slot_matrix[atual->l][atual->c].parent_position.c;
 
-	int lp = slot_matrix[v->l][v->c].parent_position.l; 
-	int cp = slot_matrix[v->l][v->c].parent_position.c;
+		int l_dir_neigh_atual = v->l - atual->l;
+		int c_dir_neigh_atual = v->c - atual->c;
 
-	b=get_weight(walls, lp, cp, lab); 
+		if((l_dir_atual_parent==l_dir_neigh_atual) && (c_dir_atual_parent==c_dir_neigh_atual))
+		{ /* same direction*/ 
+			neighbour_weight=get_weight(walls,v->l,v->c,lab);
 
-	if(a>0) 
-	{
-		if(b>0)
-		{
-			b=get_weight(walls, lp, cp, lab);
-			return -1;
-		}else{
-			return a; 
-		}
-	}
-	if(a==0) 
-	{
-		if(b==0)
-		{
-			return 0;
-		}
-		else 
-		{
-			int lg=slot_matrix[lp][cp].parent_position.l; 
-			int cg=slot_matrix[lp][cp].parent_position.c;
-
-			if (((v->l)-lp == lp-lg) && ((v->c)-cp == cp-cg)){
-
-				return a;
+			if(neighbour_weight==0)
+			{ /*crosses to white*/
+				return 0;
 			}
 			else
-			{
-				return -1;
+			{/*crosses to not white*/
+				return-1;
 			}
-
+		}
+		else /*not same direction when crossing*/
+		{
+			return -1;
 		}
 	}
-	
-	return 0;
+	else 
+	{ /*not crossing*/
+		neighbour_weight=get_weight(walls,v->l,v->c,lab);
+
+		if(neighbour_weight==0)
+		{/*white to white*/
+			return 0;
+		}
+		if(neighbour_weight<0)
+		{ /*black tile*/
+			return -1;
+		}
+		if(neighbour_weight>0)
+		{ /*checks if next neighbour of grey tile in same direction is white - a bit redundant with crossing logics*/ 
+			next_neighbour_same_dir_w=next_neighbour_same_dir(walls,v,dir_flag,lab);
+
+			if(next_neighbour_same_dir_w==0)
+			{
+				return neighbour_weight;
+			}else{
+				return -1;
+			}
+		}
+	}
+	return -3; /**/
 }
 
 int isTarget(coord* u,lab_info* lab){
@@ -266,10 +277,53 @@ traceback* init_trace(traceback* final_path,int step_count,int found_flag)
 	if(found_flag==1)
 	{
 
-
-
-
 	}
 
 	return final_path;
+}
+
+int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
+{
+	int w;
+	int l_next;
+	int c_next;
+
+	switch (dir)
+	{
+	case 1: /*right c+1*/
+		c_next = v->c+1;
+		l_next = v->l;
+		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
+			return -1;
+
+		w = get_weight(walls,l_next,c_next,lab);
+		return w;
+	case 2: /*left*/
+		c_next = v->c-1;
+		l_next = v->l;
+		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
+			return -1;
+			
+		w = get_weight(walls,l_next,c_next,lab);
+		return w;
+	case 3: /*down*/
+		c_next = v->c;
+		l_next = v->l+1;
+		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
+			return -1;
+			
+		w = get_weight(walls,l_next,c_next,lab);
+		return w;
+	case 4: /**/
+		c_next = v->c;
+		l_next = v->l-1;
+		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
+			return -1;
+			
+		w = get_weight(walls,l_next,c_next,lab);
+		return w;
+	default:
+		return -2;
+	}
+
 }
