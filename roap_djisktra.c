@@ -49,8 +49,8 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	u_pop = (coord*)malloc(sizeof(coord));
 
 	slot_matrix[0][0].w=0; /*src*/
-	slot_matrix[0][0].parent_position.l=0;
-	slot_matrix[0][0].parent_position.c=0;
+	slot_matrix[0][0].parent_position.l=-1;
+	slot_matrix[0][0].parent_position.c=-1;
 	PQ = PQ_update(PQ,slot_matrix,0,0);
 
 	PQ_print(PQ,slot_matrix);
@@ -82,6 +82,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
+				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -101,6 +102,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
+				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -120,6 +122,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
+				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -139,6 +142,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
+				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -154,6 +158,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;
 		printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);
 		PQ_print(PQ,slot_matrix);
+		final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
     	
 	}
 	else
@@ -212,6 +217,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 			else
 			{/*crosses to not white*/
 				return-1;
+				printf("\n not valid crossing to %d %d",v->l,v->c);
 			}
 		}
 		else /*not same direction when crossing*/
@@ -239,6 +245,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 			{
 				return neighbour_weight;
 			}else{
+				printf("\n not valid neighbour (%d,%d) cause next neighbour in same dir is not whit ", v->l,v->c);
 				return -1;
 			}
 		}
@@ -257,25 +264,19 @@ int isTarget(coord* u,lab_info* lab){
 	}
 }
 
-traceback* tracebackaroni(slot** slot_matrix,traceback* final_path)
+traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* target)
 {
-	int step_count = 0;
-	final_path=init_trace(final_path,step_count,1);
+	int step_count = 1; /*to include starting point*/
+	int crawler_l = target->l;
+	int crawler_c = target->c;
+	final_path=(traceback*)malloc(sizeof(traceback));
 
-	return final_path;
-}
-
-traceback* init_trace(traceback* final_path,int step_count,int found_flag)
-{
-	if(found_flag==-1) /*map has no solution*/
+	while((crawler_l!=0) && (crawler_c!=0))
 	{
-		final_path=(traceback*)malloc(sizeof(traceback));
-		final_path->steps=-1;
-		final_path->total_cost=-1;
-	}
-
-	if(found_flag==1)
-	{
+		step_count++;
+		crawler_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
+		crawler_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
+		printf("\n(%d,%d)",crawler_l,crawler_c);
 
 	}
 

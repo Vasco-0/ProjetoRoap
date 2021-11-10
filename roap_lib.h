@@ -107,8 +107,7 @@ int isEmpty(minHeap* PQ);
 int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
 int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab);
 int isTarget(coord* u,lab_info* lab);
-traceback* tracebackaroni(slot** slot_matrix,traceback* final_path);
-traceback* init_trace(traceback* final_path,int step_count,int found_flag);
+traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
 
 /*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
