@@ -18,15 +18,6 @@ typedef struct slot{
 
 }slot;
 
-typedef struct traceback{
-
-    int flag_found;
-    int steps; /*size of path */
-    int total_cost;
-    coord* path;
-
-}traceback;
-
 typedef struct minHeap{
 
     int size; /*LxC quando iniciado*/
@@ -69,6 +60,14 @@ typedef struct parede
     int custo;
 } parede;
 
+typedef struct traceback{
+
+    int flag_found;
+    int steps; /*size of path */
+    int total_cost;
+    parede* path;
+
+}traceback;
 
 int N_mapas;
 int vect_insert_pos;
@@ -105,7 +104,8 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
 int get_weight (parede** walls, int L, int C, lab_info* lab);
 slot** init_slot_matrix(lab_info* lab);
 int isEmpty(minHeap* PQ);
-int is_neighbour_valid(parede** walls, coord* v,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
+int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
+int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab);
 int isTarget(coord* u,lab_info* lab);
 traceback* tracebackaroni(slot** slot_matrix,traceback* final_path);
 traceback* init_trace(traceback* final_path,int step_count,int found_flag);
