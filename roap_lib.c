@@ -12,7 +12,6 @@ FILE* open_file_in (char* filename){
     FILE *fp;  
 	fp = fopen(filename, "r");
 	if (fp == NULL){
-		printf("exit\n"); fflush(stdout);
 		exit(0);
 	}
 	return fp;
@@ -125,7 +124,7 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
         	N_mapas++;
     	}
 	}
-	/*chato, eu sei, só por causa do A*/
+
 	if(fase_flag==2){
     	while (((fscanf(fptr, "%d %d %d %d", 
                 &L_aux_m, &C_aux_m, &L1_aux_m, &C1_aux_m)) == 4)){
@@ -169,26 +168,23 @@ void write_to_file(char* nome_file_out){
 }
 
 
-lab_info* Data_Process_final(FILE* fptr, parede** walls, lab_info* head){
+lab_info* Data_Process_final(FILE* fptr, minHeap* PQ, parede** walls, lab_info* head){
 
     
     int lin, col, val;
     int i_P;
     int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
+	traceback* final_path = NULL;
 	parede* new_wall;
 	lab_info* new;
 	int idx;
 
-	/*para teste*/
-	int custo;
-	
-	/*int (*hash_key_ptr)(int, int, int, int);
-	hash_key_ptr=&hash_key;*/
-
     while (((a=fscanf(fptr, "%d %d %d %d %d", 
                 &L_aux, &C_aux, &L1_aux, &C1_aux,&P_aux)) == 5)){
 
-		new = malloc(sizeof(lab_info));
+		L1_aux=L1_aux-1;
+		C1_aux=C1_aux-1;
+		new = (lab_info*)malloc(sizeof(lab_info));
 		new->L=L_aux;
 		new->C=C_aux;
 		new->L_target=L1_aux;
@@ -213,23 +209,25 @@ lab_info* Data_Process_final(FILE* fptr, parede** walls, lab_info* head){
             //mapa válido 
             while (i_P<P_aux){
                 if(fscanf(fptr,"%d %d %d", &lin, &col, &val)==3){
-                    if(((lin>=0)&&(lin<=L_aux)&&(col>=0)&&(col<=C_aux)) && ((val>0) || (val=-1))){
+					lin = lin-1;
+					col = col-1;
+                    if(((lin>=0)&&(lin<L_aux)&&(col>=0)&&(col<C_aux)) && ((val>0) || (val=-1)))
+					{
 						new_wall=struct_wall_init(new_wall, lin, col, val);
 						idx = hash_key(lin, col, C_aux);
                         walls = hash_insert(walls, new_wall, idx);
+						
                     }
                     i_P++;                    
                 }
             }  
             i_P=0;
 	    }
-		/*hash_print(walls);*/
-		printf("\n L %d C %d P %d \n ", new->L, new->C,new->P);
-		printf("\n l %d c %d \n", lin,col);
-		custo=get_weight(walls, lin, col, new);
-		printf("custo: %d\n\n", custo);
+		/*
+		PQ_print(PQ, slot_matix);
+        */   
 
-		/*dijsktra(walls, new);*/
+		final_path = dijsktra(walls, new,PQ);
 		/* insere resolvido na lista */ 
 
 		walls=hash_clear(walls);
@@ -278,7 +276,7 @@ parede** hash_insert(parede** vect, parede* p, int idx)
 				vect[idx]=p;	
 
 			idx++;
-			if (idx>=hash_size)
+			if (idx>hash_size)
 				/*dar a volta*/
 				idx=0;
 		}
@@ -304,7 +302,7 @@ int hash_get(parede** vect, int idx, int L, int C)
 			if((vect[idx]->L==L) && (vect[idx]->C==C))
 				return vect[idx]->custo;
 			idx++;
-			if (idx>=hash_size)
+			if (idx>hash_size)
 				/*dar a volta*/
 				idx=0;
 		}
@@ -328,7 +326,7 @@ int hash_key(int L, int C, int C_dim)
 
 int get_weight (parede** walls, int L, int C, lab_info* lab)
 {
-	if(L>lab->L || C>lab->C || L<1 || C<1)
+	if(L>=lab->L || C>=lab->C || L<0 || C<0)
 		return -2; /*out of bounds*/
 
 	int idx;
@@ -364,38 +362,161 @@ minHeap* PQ_init(minHeap* PQ, int V)
 	return PQ;
 }
 
-coord* PQ_pop(minHeap* PQ)
-{
-	PQ->minHeap_array[0]=NULL;
-	PQ->size--;
-	/*PQ_resort();*/
-}
 
-coord* PQ_find(int l, int c,minHeap* PQ) /*recebe coordenada e vê se está no PQ*/
+minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 {
+	int i, j, k=0;
+	/*int l, c,z;*/	
+	int size_of_new;
 
+	//printf("in restart, lab: %d %d\n", lab->L, lab->C); fflush(stdout);
+	size_of_new = (lab->L)*(lab->C);
+	PQ->size=size_of_new;
+
+	printf("L %d, C %d\n", lab->L, lab->C); fflush(stdout);
+	for(i=0; i<lab->L; i++){
+		for(j=0; j<lab->C; j++){
+			PQ->minHeap_array[k]->l=i;
+			PQ->minHeap_array[k]->c=j;
+			k++;
+		}
+	}
+	/*possivel otimização*/
+	/*
+	for(i=1; i<=lab->L; i++){
+		l=i;
+		c=i;
+		PQ->minHeap_array[k]->l=i;
+		PQ->minHeap_array[k]->c=i;
+		k++;
+		for (j=l, z=c; j>1 || z>1; j++, z++){
+			PQ->minHeap_array[k]->l=l;
+			PQ->minHeap_array[k]->c=k--;
+			k++;
+			PQ->minHeap_array[k]->l=j--;
+			PQ->minHeap_array[k]->c=c;	
+			k++;
+		}
+	}
+	*/
+	return PQ;
 }
 
 
 minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c) /*receber coordenada que recebeu atualização (menor custo) e reordena heap*/
 {
 	int i;
-	int a; 
-
-	for(i=0; i<PQ->size;i++){
+	//printf("\nin update\n"); fflush(stdout);
+	for(i=0; i<PQ->size; i++){
 		if((l==PQ->minHeap_array[i]->l) && (c==PQ->minHeap_array[i]->c)){	
-			while((a=less_pri(i, (i-1)/2,PQ,slot_matrix)) == 1)
-			{
-				PQ = exch(i, (i-1)/2, PQ);
-				PQ = fixup(i, PQ, slot_matrix);
-				i=(i-1)/2;
-			}
-			break;
-		} 
+
+			PQ = fixup(i, PQ, slot_matrix);
+		}
 	}
 
 	return PQ;
 }
+
+
+coord* PQ_pop(minHeap* PQ, slot** slot_matrix)
+{	
+	coord* top = (coord*)malloc(sizeof(coord));
+	//printf("in pop\n"); fflush(stdout);
+	top->l=PQ->minHeap_array[0]->l;
+	top->c=PQ->minHeap_array[0]->c;
+	
+	exch(0, PQ->size-1, PQ);
+	PQ->size--;
+	PQ=fixdown(PQ, slot_matrix, 0);	
+	
+	return top;
+}
+
+
+
+minHeap* fixdown(minHeap* PQ, slot** slot_matrix, int parent)
+{	
+	int left = 2*parent+1;
+    int right = 2*parent+2;
+	int min;
+
+
+	/*printf("\nin fixdown\n"); fflush(stdout);
+	printf("size: %d\nparent: %d, left: %d, right: %d\n", PQ->size, parent, left, right); fflush(stdout);
+	printf("w_parent %d, w_left %d, w_right %d\n", 
+				slot_matrix[PQ->minHeap_array[parent]->l][PQ->minHeap_array[parent]->c].w,
+				slot_matrix[PQ->minHeap_array[left]->l][PQ->minHeap_array[left]->c].w,
+				slot_matrix[PQ->minHeap_array[right]->l][PQ->minHeap_array[right]->c].w); fflush(stdout);
+	*/
+	if (PQ->size>1)
+  	{
+		if ((left >= PQ->size) ||  left < 0){
+      		left = -1;
+			//printf("left>\n"); fflush(stdout);
+			}
+    	if ((right >= PQ->size) || right < 0){
+      		right = -1;
+			//printf("right>\n"); fflush(stdout);
+			}
+
+    	if (left != -1  &&  less_pri(left, parent, PQ, slot_matrix)==0){
+			min=left;
+			//printf("min= left\n"); fflush(stdout);
+		}
+		else{
+			min = parent;
+			//printf("min=parent\n"); fflush(stdout);
+		}
+		if (right != -1  &&  less_pri(right, min, PQ, slot_matrix)==0)
+      		min=right;
+
+		if(min!=parent){
+			//printf("exch\n"); fflush(stdout);
+			exch(parent, min, PQ);
+      		PQ=fixdown(PQ, slot_matrix, min);
+    	}
+  	}
+	//printf("out fixdown\n"); fflush(stdout);
+	return PQ;
+}
+
+
+minHeap* fixup(int idx, minHeap* PQ, slot** slot_matrix)
+{
+	int parent=(idx-1)/2;
+	//printf("->in fixup\n"); fflush(stdout);
+	/*printf("w_parent %d, w_idx %d\n", 
+				slot_matrix[PQ->minHeap_array[parent]->l][PQ->minHeap_array[parent]->c].w,
+				slot_matrix[PQ->minHeap_array[idx]->l][PQ->minHeap_array[idx]->c].w); fflush(stdout);
+*/
+	if(less_pri(parent, idx, PQ, slot_matrix)==1){
+		//printf("swap\n"); fflush(stdout);
+		//printf("pre exch: prt l=%d prt c=%d, idx l=%d, idx c=%d\n", PQ->minHeap_array[parent]->l, PQ->minHeap_array[parent]->c,
+		 //		PQ->minHeap_array[idx]->l, PQ->minHeap_array[idx]->c); fflush(stdout);
+		PQ = exch(parent, idx, PQ);
+		//printf("pos exch: prt l=%d prt c=%d, idx l=%d, idx c=%d\n", PQ->minHeap_array[parent]->l, PQ->minHeap_array[parent]->c,
+		 //		PQ->minHeap_array[idx]->l, PQ->minHeap_array[idx]->c); fflush(stdout);
+		PQ = fixup(parent, PQ, slot_matrix);
+	}
+	//printf("->out fixup\n"); fflush(stdout);
+	return PQ;
+}
+
+
+
+int PQ_find(minHeap* PQ, int l, int c) /*recebe coordenada e vê se está no PQ*/
+{
+	int i;
+
+	for(i=0; i<PQ->size; i++){
+		if((l==PQ->minHeap_array[i]->l) && (c==PQ->minHeap_array[i]->c)){
+			return 1;
+		}
+	}		
+	return 0;
+}
+
+
 
 
 int less_pri(int a, int b, minHeap* PQ, slot** slot_matrix)
@@ -424,14 +545,3 @@ minHeap* exch(int a, int b, minHeap* PQ)
 
 	return PQ;
 }
-
-minHeap* fixup(int idx, minHeap* PQ, slot** slot_matrix)
-{
-	while(idx>0 && less_pri((idx-1)/2, idx, PQ, slot_matrix)==1){
-		exch(idx, (idx-1)/2, PQ);
-		idx=(idx-1)/2;
-	}
-
-	return PQ;
-}
-

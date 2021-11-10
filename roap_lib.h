@@ -30,7 +30,6 @@ typedef struct traceback{
 typedef struct minHeap{
 
     int size; /*LxC quando iniciado*/
-    int dim; /*always LxC*/
     coord** minHeap_array; /*double pointer para facilidade de rearranjar array*/
 
 }minHeap;
@@ -88,7 +87,7 @@ FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
 char* check_extension (char* nome_file_out, char* filename, int fase_flag);
 void write_to_file(char* nome_file_out);
-lab_info* Data_Process_final(FILE* fptr, parede** walls,lab_info* lab);
+lab_info* Data_Process_final(FILE* fptr,minHeap* PQ, parede** walls,lab_info* lab);
 
 FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag);
 
@@ -115,14 +114,17 @@ traceback* init_trace(traceback* final_path,int step_count,int found_flag);
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
 void conceptual_matrix_printer(parede** walls, lab_info* lab);
 void hash_print(parede** vect);
+void PQ_print(minHeap* PQ, slot** slot_matix);
+
 
 /*PQ*/
 minHeap* PQ_init(minHeap* PQ, int V);
-coord* PQ_find(int l, int c,minHeap* PQ); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
-coord* PQ_pop(minHeap* PQ);/*pop do valor do topo da queue*/
+int PQ_find(minHeap* PQ, int l,int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
+coord* PQ_pop(minHeap* PQ,slot** slo_matrix);/*pop do valor do topo da queue*/
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ);
 minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c);
 minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
+minHeap* fixdown(minHeap* PQ, slot** slot_matrix, int parent);
 minHeap* exch(int a, int b,minHeap* PQ);
 int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix);
 

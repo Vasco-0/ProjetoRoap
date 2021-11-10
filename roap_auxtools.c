@@ -26,36 +26,6 @@ void conceptual_matrix_printer(parede** walls, lab_info* lab){
 
 }
 
-/*
-int get_weight_beta(int l,int c, lab_info* lab){
-
-	if(l>lab->L || c>lab->C || l<1 || c<1)
-		return -2; *//*out of bounds*//*
-	if((l=1) && (c==3)) 				
-		return 10;
-	if((l=2) && (c==2))
-		return 3; 
-	if(l=2 && c==1)
-		return 2; 
-	if(l=2 && c==3)
-		return 2; 
-	if(l=3 && c==3)
-		return 3; 
-	if((l=2) && (c==4))
-		return 1; 
-	if((l=4) && (c==2))
-		return 5; 
-	if(l=5 && c==2)
-		return 6; 
-	if(l=4 && c==3)
-		return 2; 
-	if(l=3 && c==1)
-		return 1; 
-	return 0;
-
-}
-*/
-
 /*Em progresso - Vasco - nota: enquanto o read file não está pronto posso ir testando o algoritmo*/
 lab_info* read_file_beta(lab_info* new){
 
@@ -85,3 +55,47 @@ void hash_print(parede** vect)
 	}
 		printf("]\n\n");
 }
+
+void PQ_print(minHeap* PQ, slot** slot_matix)
+{
+	int i;
+
+	printf("\nin print, size %d\n", PQ->size); fflush(stdout);
+	printf("PQ: [\n");
+	for(i=0; i<PQ->size; i++){
+		printf("(%d %d %d)\n", PQ->minHeap_array[i]->l, PQ->minHeap_array[i]->c,
+		slot_matix[PQ->minHeap_array[i]->l][PQ->minHeap_array[i]->c].w);
+	}
+		printf("]\n");
+}
+
+
+/*
+int part(minHeap *PQ, slot** slot_matrix, int l, int r)
+{
+    int i, j;
+    int v = PQ->minHeap_array[r]; 
+	i = l-1; 
+	j = r;  
+    for (;;) {
+        while (lesspri(++i, v))
+        
+        while (less(v, --j)){
+           if (j == l) break;
+        }
+        if (i >= j) break;
+        exch(i, j);
+    }
+    exch(a[i], a[r]);
+    return i;
+}
+void quicksort(Item a[], int l, int r, int (*less) (Item, Item))
+{
+   
+    int i;
+    if (r <= l) return;
+    i = part(a, l, r, less_pri());
+    quicksort(a, l, i-1, less_pri());
+    quicksort(a, i+1, r, less);
+}
+*/
