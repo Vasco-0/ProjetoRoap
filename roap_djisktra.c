@@ -164,13 +164,14 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ,slot** slot_matri
 		int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;
 		printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);
 		PQ_print(PQ,slot_matrix);
-		//final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
+		final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
     	
 	}
 	else
 	{
+
 		printf("\n\n NO SOLUTION\n\n\n");
-		//final_path=init_trace(final_path,0,-1);
+		final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
 		/*return traceback with flag of not found*/
 	}
 	
@@ -274,48 +275,63 @@ int isTarget(coord* u,lab_info* lab){
 traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* target)
 {
 	printf("\n____PATH");
-	int i=0;
+	int break_walls=0;
 	int a;
 	int step_count = 0; /*to include starting point*/
 	int crawler_l = target->l;
-	int isSource=0;
 	int crawler_c = target->c;
+	int total_cost;
 
-	while(isSource!=1)
+	if(target_flag==0)
 	{
+		final_path=(traceback*)malloc(sizeof(traceback));
+		final_path->path=(coord*)malloc(sizeof(coord));
+		final_path->total_cost=-1;
+
+		return final_path;
+	}
+
+	int aux_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
+	int aux_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
+	total_cost=slot_matrix[aux_l][aux_c].w;
+
+	while(1)
+	{
+		if((crawler_l==0) && (crawler_c==0))
+			break;
 		step_count++;
 		crawler_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
 		crawler_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
-
-		if((crawler_l==0) && (crawler_c==0))
-			isSource=1;
 	}
-	
-	//final_path=(traceback*)malloc(sizeof(traceback));
-	//final_path->path=(coord*)malloc(step_count*sizeof(coord));
-	//final_path->steps=step_count;
 
-	isSource=0;
 
-	while(isSource!=1)
+	  crawler_l = target->l;
+	  crawler_c = target->c;
+
+	final_path=(traceback*)malloc(sizeof(traceback));
+	final_path->path=(coord*)malloc(step_count*sizeof(coord));
+
+	while(1)
 	{
+		if((crawler_l==0) && (crawler_c==0))
+			break;
+
 		crawler_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
 		crawler_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
 
 		if((a=slot_matrix[crawler_l][crawler_c].p)>0)
 		{
-			//final_path->path[i].l=crawler_l;
-			//final_path->path[i].c=crawler_c;
+			break_walls++;
+			final_path->path[break_walls].l=crawler_l;
+			final_path->path[break_walls].c=crawler_c;
+			final_path->path[break_walls].w=a;
+
 			printf("\n(%d,%d) is a wall of weight %d ",crawler_l,crawler_c,a);
 		}
-
-		//printf("\n(%d,%d)",crawler_l,crawler_c);
-		if((crawler_l==0) && (crawler_c==0))
-			isSource=1;
-
+		final_path->steps=break_walls;
+		final_path->total_cost=total_cost;
 	}
 	
-
 	return final_path;
 }
 

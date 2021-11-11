@@ -9,6 +9,7 @@
 typedef struct coord{ /*mesma função de um node name num grafo*/
     int l;
     int c;
+    int w;
     
 }coord;
 
