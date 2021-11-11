@@ -157,7 +157,7 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-void write_to_file(FILE* fptr, traceback* traceback)
+/*void write_to_file(FILE* fptr, traceback* traceback)
 {
 	int i;
 
@@ -168,7 +168,7 @@ void write_to_file(FILE* fptr, traceback* traceback)
 			fprintf(fptr,"%d %d %d", (traceback->path[i].L+1), traceback->path[i].C+1, traceback->path[i].custo);
 		}
 	}
-}
+}*/
 
 
 void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** walls){
@@ -180,6 +180,7 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
 	traceback* final_path = NULL;
 	parede* new_wall=NULL;
 	lab_info* new=NULL;
+	slot** slot_matrix;
 	int idx;
 
 	new = (lab_info*)malloc(sizeof(lab_info));
@@ -213,12 +214,16 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
 
         else{
             //mapa válido 
+
+			slot_matrix=init_slot_matrix(new);
+
             while (i_P<P_aux){
                 if(fscanf(fptr_in,"%d %d %d", &lin, &col, &val)==3){
 					lin = lin-1;
 					col = col-1;
                     if(((lin>=0)&&(lin<L_aux)&&(col>=0)&&(col<C_aux)) && ((val>0) || (val=-1)))
 					{
+						slot_matrix[lin][col].p=val;
 						new_wall=struct_wall_init(new_wall, lin, col, val);
 						idx = hash_key(lin, col, C_aux);
                         walls = hash_insert(walls, new_wall, idx);
@@ -232,7 +237,7 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
 		PQ_print(PQ, slot_matix);
         */   
 
-		final_path = dijsktra(walls, new, PQ); 
+		final_path = dijsktra(walls, new, PQ,slot_matrix); 
 		/*write_to_file(fptr_out, final_path);*/
 		
 		walls=hash_clear(walls);
@@ -332,16 +337,12 @@ int hash_key(int L, int C, int C_dim)
 }
 
 
-int get_weight (parede** walls, int L, int C, lab_info* lab)
+int get_weight (parede** walls, int L, int C, lab_info* lab,slot** slot_matrix)
 {
 	if(L>=lab->L || C>=lab->C || L<0 || C<0)
 		return -2; /*out of bounds*/
 
-	int idx;
-
-	idx=hash_key(L, C, C_aux);
-
-	return hash_get(walls, idx, L, C);
+	return slot_matrix[L][C].p;
 }
 
 

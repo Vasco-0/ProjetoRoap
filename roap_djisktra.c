@@ -21,14 +21,16 @@ slot** init_slot_matrix(lab_info* lab)
 
 		for( k=0;k<(lab->C); k++){
 			slot_matrix[j][k].w=INF;
+			slot_matrix[j][k].p=0;
 		}
 	}
 	printf("slot matrix allocada");
 	return slot_matrix;
 }
 
-traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
+traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ,slot** slot_matrix)
 {
+	int noSolFlag;
 	int i;
 	traceback* final_path=NULL;
 	int dir_flag; /*right 1 left 2 down 3 up 4*/
@@ -38,12 +40,11 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	int alt; /*to compare weights*/
 	coord* v = NULL;  /*do i need to alloc this pointers to structs ??*/
 	coord* u_pop = NULL;
-	slot** slot_matrix = NULL;
 
 	int l_previous;
 	int c_previous;
 
-	slot_matrix=init_slot_matrix(lab);
+	//slot_matrix=init_slot_matrix(lab);
 	PQ = PQ_restart(lab,PQ);
 
 	//PQ_print(PQ,slot_matrix);
@@ -63,8 +64,14 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 	while(!isEmpty(PQ))
 	{
 		u_pop = PQ_pop(PQ,slot_matrix,u_pop); ;
+
+		if(slot_matrix[u_pop->l][u_pop->c].w==INF){
+			noSolFlag==1;
+			break;
+		}
+
 		printf("\n\n popped (%d,%d)",u_pop->l,u_pop->c);
-		
+
 		if(isTarget(u_pop,lab)==1)
 		{
 			target_flag=1;
@@ -84,7 +91,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -104,7 +111,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -124,7 +131,7 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -144,14 +151,11 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf("\n parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
-		else
-		{
 
-		}
 	}/*end and time for traceback*/
 	
 	if(target_flag==1)
@@ -160,11 +164,12 @@ traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ)
 		int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;
 		printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);
 		PQ_print(PQ,slot_matrix);
-		final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
+		//final_path=tracebackaroni(walls,slot_matrix,final_path,lab,target_flag,u_pop);
     	
 	}
 	else
 	{
+		printf("\n\n NO SOLUTION\n\n\n");
 		//final_path=init_trace(final_path,0,-1);
 		/*return traceback with flag of not found*/
 	}
@@ -198,7 +203,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 			return -1;
 	} 
 	
-	atual_weight=get_weight(walls,atual->l,atual->c,lab);
+	atual_weight=slot_matrix[atual->l][atual->c].p;
 
 	if (atual_weight>0)
 	{ /*crossing*/
@@ -210,7 +215,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 
 		if((l_dir_atual_parent==l_dir_neigh_atual) && (c_dir_atual_parent==c_dir_neigh_atual))
 		{ /* same direction*/ 
-			neighbour_weight=get_weight(walls,v->l,v->c,lab);
+			neighbour_weight=slot_matrix[v->l][v->c].p;
 
 			if(neighbour_weight==0)
 			{ /*crosses to white*/
@@ -229,7 +234,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 	}
 	else 
 	{ /*not crossing*/
-		neighbour_weight=get_weight(walls,v->l,v->c,lab);
+		neighbour_weight=slot_matrix[v->l][v->c].p;
 
 		if(neighbour_weight==0)
 		{/*white to white*/
@@ -241,7 +246,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 		}
 		if(neighbour_weight>0)
 		{ /*checks if next neighbour of grey tile in same direction is white - a bit redundant with crossing logics*/ 
-			next_neighbour_same_dir_w=next_neighbour_same_dir(walls,v,dir_flag,lab);
+			next_neighbour_same_dir_w=next_neighbour_same_dir(walls,v,dir_flag,lab,slot_matrix);
 
 			if(next_neighbour_same_dir_w==0)
 			{
@@ -269,24 +274,52 @@ int isTarget(coord* u,lab_info* lab){
 traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* target)
 {
 	printf("\n____PATH");
-	int step_count = 1; /*to include starting point*/
+	int i=0;
+	int a;
+	int step_count = 0; /*to include starting point*/
 	int crawler_l = target->l;
+	int isSource=0;
 	int crawler_c = target->c;
-	final_path=(traceback*)malloc(sizeof(traceback));
 
-	while((crawler_l!=0) && (crawler_c!=0))
+	while(isSource!=1)
 	{
 		step_count++;
 		crawler_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
 		crawler_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
-		printf("\n(%d,%d)",crawler_l,crawler_c);
+
+		if((crawler_l==0) && (crawler_c==0))
+			isSource=1;
+	}
+	
+	//final_path=(traceback*)malloc(sizeof(traceback));
+	//final_path->path=(coord*)malloc(step_count*sizeof(coord));
+	//final_path->steps=step_count;
+
+	isSource=0;
+
+	while(isSource!=1)
+	{
+		crawler_l=slot_matrix[crawler_l][crawler_c].parent_position.l;
+		crawler_c=slot_matrix[crawler_l][crawler_c].parent_position.c;
+
+		if((a=slot_matrix[crawler_l][crawler_c].p)>0)
+		{
+			//final_path->path[i].l=crawler_l;
+			//final_path->path[i].c=crawler_c;
+			printf("\n(%d,%d) is a wall of weight %d ",crawler_l,crawler_c,a);
+		}
+
+		//printf("\n(%d,%d)",crawler_l,crawler_c);
+		if((crawler_l==0) && (crawler_c==0))
+			isSource=1;
 
 	}
+	
 
 	return final_path;
 }
 
-int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
+int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab,slot** slot_matrix)
 {
 	int w;
 	int l_next;
@@ -300,7 +333,7 @@ int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
 		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
 			return -1;
 
-		w = get_weight(walls,l_next,c_next,lab);
+		w = slot_matrix[l_next][c_next].p;
 		return w;
 	case 2: /*left*/
 		c_next = v->c-1;
@@ -308,7 +341,7 @@ int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
 		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
 			return -1;
 			
-		w = get_weight(walls,l_next,c_next,lab);
+		w = slot_matrix[l_next][c_next].p;
 		return w;
 	case 3: /*down*/
 		c_next = v->c;
@@ -316,7 +349,7 @@ int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
 		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
 			return -1;
 			
-		w = get_weight(walls,l_next,c_next,lab);
+		w = slot_matrix[l_next][c_next].p;
 		return w;
 	case 4: /**/
 		c_next = v->c;
@@ -324,7 +357,7 @@ int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab)
 		if((l_next>=lab->L) || (c_next>=lab->C) || (c_next<0) || (l_next<0))
 			return -1;
 			
-		w = get_weight(walls,l_next,c_next,lab);
+		w = slot_matrix[l_next][c_next].p;
 		return w;
 	default:
 		return -2;

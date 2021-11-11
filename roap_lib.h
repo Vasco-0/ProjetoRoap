@@ -14,6 +14,7 @@ typedef struct coord{ /*mesma função de um node name num grafo*/
 
 typedef struct slot{
     int w;
+    int p; 
     coord parent_position;
 
 }slot;
@@ -65,7 +66,7 @@ typedef struct traceback{
     int flag_found;
     int steps; /*size of path */
     int total_cost;
-    parede* path;
+    coord* path;
 
 }traceback;
 
@@ -101,14 +102,15 @@ void free_walls(parede** heap);
 void free_PQ(minHeap *PQ, int V);
 
 /*djisktra*/
-traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ);
-int get_weight (parede** walls, int L, int C, lab_info* lab);
+traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ,slot** slot_matrix);
+int get_weight (parede** walls, int L, int C, lab_info* lab,slot** slot_matrix);
 slot** init_slot_matrix(lab_info* lab);
 int isEmpty(minHeap* PQ);
 int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
-int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab);
+int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab,slot** slot_matrix);
 int isTarget(coord* u,lab_info* lab);
 traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
+int mapAsNoSolution(slot** slot_matrix,coord* u_pop);
 
 /*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
