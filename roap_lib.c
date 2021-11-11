@@ -161,7 +161,7 @@ void write_to_file(FILE* fptr, traceback* traceback)
 {
 	int i=0;
 
-	fprintf(fptr,"%d\n", traceback->total_cost);
+	fprintf(fptr,"\n\n%d", traceback->total_cost);
 	if(traceback->total_cost>0){
 		fprintf(fptr,"\n%d", traceback->steps);
 		for(i=1;i<=traceback->steps;i++){
@@ -171,20 +171,17 @@ void write_to_file(FILE* fptr, traceback* traceback)
 }
 
 
-void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** walls){
+void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
 
     int i;
     int lin, col, val;
     int i_P;
     int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
 	traceback* final_path = NULL;
-	parede* new_wall=NULL;
 	lab_info* new=NULL;
-	slot** slot_matrix;
-	int idx;
+	slot** slot_matrix = NULL;
 
 	new = (lab_info*)malloc(sizeof(lab_info));
-	new_wall = (parede*)malloc(sizeof(parede));
 
     while (((a=fscanf(fptr_in, "%d %d %d %d %d", 
                 &L_aux, &C_aux, &L1_aux, &C1_aux,&P_aux)) == 5)){
@@ -214,7 +211,6 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
 
         else{
             //mapa válido 
-
 			slot_matrix=init_slot_matrix(new);
 
             while (i_P<P_aux){
@@ -224,9 +220,6 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
                     if(((lin>=0)&&(lin<L_aux)&&(col>=0)&&(col<C_aux)) && ((val>0) || (val=-1)))
 					{
 						slot_matrix[lin][col].p=val;
-						new_wall=struct_wall_init(new_wall, lin, col, val);
-						idx = hash_key(lin, col, C_aux);
-                        walls = hash_insert(walls, new_wall, idx);
                     }
                     i_P++;                    
                 }
@@ -234,131 +227,29 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
             i_P=0;
 	    }
 
-		final_path = dijsktra(walls, new, PQ,slot_matrix); 
+		final_path = dijsktra(new, PQ,slot_matrix); 
 
 		for(i=1;i<=final_path->steps;i++){
 			printf("\n (%d,%d)",final_path->path[i].l,final_path->path[i].c);
-			printf(" broke %d",final_path->steps);
 		}
+		printf("\n broke %d",final_path->steps);
+
 		write_to_file(fptr_out, final_path);
 
 		free(final_path->path);
 		free(final_path);
 		
-		walls=hash_clear(walls);
-		
     }
 	free(new);
-	free(new_wall);
     return;
 }
 
-
-
-parede** walls_vect_init(parede** vect, int P_max)
-{	
-	/*aloca com tamnaho P do maior mapa pela mesma razão do intermédio 
-	e porque todas as outras hash beneficiam, quanto mais pequeno for o seu mapa*/
-
-	/*continua-se a considerar o fator de compensação (80%, a ajustar) para o maior mapa*/
-	hash_size=P_max/0.8; 
-	vect = (parede**) malloc(hash_size*sizeof(parede*));
-	hash_clear(vect);
-
-	return vect;
-}
-
-parede** hash_clear(parede** vect)
-{
-	int i;
-
-	for(i=0; i<hash_size; i++){
-		vect[i]=NULL;
-	}
-	return vect;
-}
-
-parede** hash_insert(parede** vect, parede* p, int idx)
-{
-
-	/*se o slot dado por key(idx) estiver vazio, inserir*/
-	if(vect[idx]==NULL){
-		vect[idx]=p;
-	}
-		
-
-	else{
-		/*se nao, procura linear, de salto 1*/
-		while(vect[idx]!=NULL){
-			if(vect[idx]==NULL)
-				vect[idx]=p;	
-
-			idx++;
-			if (idx>hash_size)
-				/*dar a volta*/
-				idx=0;
-		}
-	}
-	return vect;
-}
-
-
-int hash_get(parede** vect, int idx, int L, int C)
-{
-	if (vect[idx]==NULL)
-		return 0;
-
-	if((vect[idx]->L==L) && (vect[idx]->C==C))
-		return vect[idx]->custo;
-
-	else{
-		/*se nao, procura linear, de salto 1*/
-		while((vect[idx]==NULL) || (vect[idx]->L!=L) || (vect[idx]->C!=C)){	
-			if (vect[idx]==NULL)
-				return 0;
-			
-			if((vect[idx]->L==L) && (vect[idx]->C==C))
-				return vect[idx]->custo;
-			idx++;
-			if (idx>hash_size)
-				/*dar a volta*/
-				idx=0;
-		}
-		return vect[idx]->custo;
-	}
-	return 0;
-}
-
-
-
-int hash_key(int L, int C, int C_dim)
-{
-	int key, idx;
-
-	key=L*C_dim+C;
-	idx=key%hash_size;
-
-	return idx;
-}
-
-
-int get_weight (parede** walls, int L, int C, lab_info* lab,slot** slot_matrix)
+int get_weight (int L, int C, lab_info* lab,slot** slot_matrix)
 {
 	if(L>=lab->L || C>=lab->C || L<0 || C<0)
 		return -2; /*out of bounds*/
 
 	return slot_matrix[L][C].p;
-}
-
-
-
-parede* struct_wall_init(parede* new_wall, int l, int c, int val)
-{
-	new_wall->L=l;
-	new_wall->C=c;
-	new_wall->custo=val;
-
-	return new_wall;
 }
 
 minHeap* PQ_init(minHeap* PQ, int V)
@@ -380,7 +271,6 @@ minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 	int i, j, k=0;
 	int size_of_new;
 
-	printf("in restart, lab: %d %d\n", lab->L, lab->C); fflush(stdout);
 	size_of_new = (lab->L)*(lab->C);
 	PQ->size=size_of_new;
 	/*PQ->idx_vect=(int*)malloc(PQ->size*sizeof(int));*/
@@ -534,8 +424,6 @@ int PQ_find(minHeap* PQ, int l, int c) /*recebe coordenada e vê se está no PQ*
 }
 
 
-
-
 int less_pri(int a, int b, minHeap* PQ, slot** slot_matrix)
 {	
 	/*
@@ -575,16 +463,6 @@ minHeap* exch(int a, int b, minHeap* PQ)
 }
 
 
-void free_walls(parede** heap)
-{
-	int i;
-	for(i=0; i<hash_size; i++){
-		free(heap[i]);
-	}
-	free(heap);
-}
-
-
 void free_PQ(minHeap *PQ, int V)
 {
 	int i;
@@ -592,6 +470,5 @@ void free_PQ(minHeap *PQ, int V)
 		free(PQ->minHeap_array[i]);
 	}
 	free(PQ->minHeap_array);
-	/*free(PQ->idx_vect);*/
 	free(PQ);
 }
