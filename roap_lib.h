@@ -66,7 +66,7 @@ typedef struct traceback{
     int flag_found;
     int steps; /*size of path */
     int total_cost;
-    parede* path;
+    coord* path;
 
 }traceback;
 
@@ -110,6 +110,7 @@ int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,
 int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab,slot** slot_matrix);
 int isTarget(coord* u,lab_info* lab);
 traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
+int mapAsNoSolution(slot** slot_matrix,coord* u_pop);
 
 /*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);

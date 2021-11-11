@@ -157,7 +157,7 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-void write_to_file(FILE* fptr, traceback* traceback)
+/*void write_to_file(FILE* fptr, traceback* traceback)
 {
 	int i;
 
@@ -168,7 +168,7 @@ void write_to_file(FILE* fptr, traceback* traceback)
 			fprintf(fptr,"%d %d %d", (traceback->path[i].L+1), traceback->path[i].C+1, traceback->path[i].custo);
 		}
 	}
-}
+}*/
 
 
 void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** walls){
