@@ -25,7 +25,6 @@ int main(int argc, char**argv){
     int P_max;
     int V;
     minHeap* PQ=NULL;
-    parede** walls=NULL;
 
 
     fase_flag = check_args(argc, argv);
@@ -63,12 +62,10 @@ int main(int argc, char**argv){
         fptr_in = maior_mapa (fptr_in, &L_max, &C_max, &P_max, fase_flag);
         V=(C_max)*(L_max);   
         /*printf("V: %d\n", V); fflush(stdout);*/
-        walls=walls_vect_init(walls, P_max);
         PQ=PQ_init(PQ, V);
 
-        Data_Process_final(fptr_in, fptr_out, PQ, walls);
+        Data_Process_final(fptr_in, fptr_out, PQ);
 
-        free_walls(walls);
         free_PQ(PQ, V);
         /*free head;*/
         

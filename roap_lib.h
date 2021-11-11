@@ -54,14 +54,6 @@ typedef struct lab_info{ /*para o final*/
 
 }lab_info;
 
-/*para paredes*/
-typedef struct parede
-{
-    int L;
-    int C;
-    int custo;
-} parede;
-
 typedef struct traceback{
 
     int flag_found;
@@ -88,35 +80,24 @@ FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
 char* check_extension (char* nome_file_out, char* filename, int fase_flag);
 void write_to_file(FILE* fptr,traceback* path);
-void Data_Process_final(FILE* fptr, FILE* fptr_out,minHeap* PQ, parede** walls);
+void Data_Process_final(FILE* fptr, FILE* fptr_out,minHeap* PQ);
 
 FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag);
 
-/*hash*/
-parede** walls_vect_init(parede** vect, int P_max);
-parede** hash_insert(parede** vect, parede* p, int idx);
-int hash_get(parede** vect, int idx, int L, int C);
-parede** hash_clear(parede** vect);
-int hash_key(int L, int C, int C_dim);
-parede* struct_wall_init(parede* new_wall, int l, int c, int val);
-void free_walls(parede** heap);
-void free_PQ(minHeap *PQ, int V);
-
 /*djisktra*/
-traceback* dijsktra(parede** walls, lab_info* lab, minHeap* PQ,slot** slot_matrix);
-int get_weight (parede** walls, int L, int C, lab_info* lab,slot** slot_matrix);
+traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix);
+int get_weight (int L, int C, lab_info* lab,slot** slot_matrix);
 slot** init_slot_matrix(lab_info* lab);
 int isEmpty(minHeap* PQ);
-int is_neighbour_valid(parede** walls, coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
-int next_neighbour_same_dir(parede** walls, coord* v, int dir, lab_info* lab,slot** slot_matrix);
+int is_neighbour_valid(coord* v,coord* atual,slot** slot_matrix,lab_info* lab,minHeap* PQ,int dir_flag);
+int next_neighbour_same_dir(coord* v, int dir, lab_info* lab,slot** slot_matrix);
 int isTarget(coord* u,lab_info* lab);
-traceback* tracebackaroni(parede** walls,slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
+traceback* tracebackaroni(slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* u);
 int mapAsNoSolution(slot** slot_matrix,coord* u_pop);
 
 /*aux tools*/
 void print_slot_matrix_w(slot** slot_matrix,lab_info* lab);
-void conceptual_matrix_printer(parede** walls, lab_info* lab);
-void hash_print(parede** vect);
+void conceptual_matrix_printer(lab_info* lab);
 void PQ_print(minHeap* PQ, slot** slot_matix);
 
 
@@ -130,6 +111,7 @@ minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
 minHeap* fixdown(minHeap* PQ, slot** slot_matrix, int parent);
 minHeap* exch(int a, int b,minHeap* PQ);
 int less_pri(int a, int b,minHeap* PQ,slot** slot_matrix);
+void free_PQ(minHeap *PQ, int V);
 
 
 
