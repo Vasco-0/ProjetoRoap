@@ -157,23 +157,23 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-/*void write_to_file(FILE* fptr, traceback* traceback)
+void write_to_file(FILE* fptr, traceback* traceback)
 {
-	int i;
+	int i=0;
 
 	fprintf(fptr,"%d\n", traceback->total_cost);
 	if(traceback->total_cost>0){
-		fprintf(fptr,"%d\n", traceback->steps);
-		for(i=traceback->steps; i>=0; i--){
-			fprintf(fptr,"%d %d %d", (traceback->path[i].L+1), traceback->path[i].C+1, traceback->path[i].custo);
+		fprintf(fptr,"\n%d", traceback->steps);
+		for(i=1;i<=traceback->steps;i++){
+			fprintf(fptr,"\n%d %d %d", (traceback->path[i].l+1), traceback->path[i].c+1, traceback->path[i].w);
 		}
 	}
-}*/
+}
 
 
 void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** walls){
 
-    
+    int i;
     int lin, col, val;
     int i_P;
     int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
@@ -233,12 +233,17 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ, parede** wal
             }  
             i_P=0;
 	    }
-		/*
-		PQ_print(PQ, slot_matix);
-        */   
 
 		final_path = dijsktra(walls, new, PQ,slot_matrix); 
-		/*write_to_file(fptr_out, final_path);*/
+
+		for(i=1;i<=final_path->steps;i++){
+			printf("\n (%d,%d)",final_path->path[i].l,final_path->path[i].c);
+			printf(" broke %d",final_path->steps);
+		}
+		write_to_file(fptr_out, final_path);
+
+		free(final_path->path);
+		free(final_path);
 		
 		walls=hash_clear(walls);
 		
