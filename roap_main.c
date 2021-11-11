@@ -1,6 +1,7 @@
 #include "roap_lib.h"
 
 /*
+
     
 */
 
@@ -15,7 +16,6 @@ int main(int argc, char**argv){
     int L_max;
 
     /*vars inter*/
-    lab_info* head= NULL;
     Lab* new_lab = NULL;
     int** mat=NULL;
     int* respostas=NULL;
@@ -33,11 +33,7 @@ int main(int argc, char**argv){
     if(fase_flag==1){
         nome_file_out = check_extension (nome_file_out, argv[2], fase_flag);
         fptr_in = open_file_in(argv[2]);
-        /*  
-            main inter
-                ->    
-                *(solver: falta A6)*  
-        */
+       
         fptr_in = maior_mapa (fptr_in, &L_max, &C_max, &P_max, fase_flag); 
         respostas = vect_alloc (respostas, N_mapas);
 	    mat = mat_alloc (mat, L_max+2, C_max+2);
@@ -55,19 +51,15 @@ int main(int argc, char**argv){
         nome_file_out = check_extension (nome_file_out, argv[1], fase_flag);
         fptr_in = open_file_in(argv[1]);
         fptr_out = open_file_out(nome_file_out);
-        /*  
-            main final
-                ->      
-        */
+       
         fptr_in = maior_mapa (fptr_in, &L_max, &C_max, &P_max, fase_flag);
         V=(C_max)*(L_max);   
-        /*printf("V: %d\n", V); fflush(stdout);*/
+        
         PQ=PQ_init(PQ, V);
 
         Data_Process_final(fptr_in, fptr_out, PQ);
 
         free_PQ(PQ, V);
-        /*free head;*/
         
     }
     free(nome_file_out);

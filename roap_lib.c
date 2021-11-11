@@ -23,7 +23,7 @@ FILE* open_file_out (char* filename){
 
 	fp = fopen(filename, "w");
 	if (fp == NULL){
-		printf("EXIT out\n"); fflush(stdout);
+		/*printf("EXIT out\n"); fflush(stdout);*/
 		exit(0);
 	}
 
@@ -157,16 +157,27 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-void write_to_file(FILE* fptr, traceback* traceback)
+void write_to_file(FILE* fptr, traceback* traceback,int notvalid)
 {
 	int i=0;
 
-	fprintf(fptr,"\n\n%d", traceback->total_cost);
+	if(notvalid==2){
+		fprintf(fptr,"0\n");
+		return;
+	}
+
+	if(notvalid==0){
+		fprintf(fptr,"-1\n");
+		return;
+	}
+
+	fprintf(fptr,"%d\n", traceback->total_cost);
 	if(traceback->total_cost>0){
-		fprintf(fptr,"\n%d", traceback->steps);
-		for(i=1;i<=traceback->steps;i++){
-			fprintf(fptr,"\n%d %d %d", (traceback->path[i].l+1), traceback->path[i].c+1, traceback->path[i].w);
+		fprintf(fptr,"%d\n", traceback->steps);
+		for(i=traceback->steps;i>=1;i--){
+			fprintf(fptr,"%d %d %d\n", (traceback->path[i].l+1), traceback->path[i].c+1, traceback->path[i].w);
 		}
+		fprintf(fptr,"\n\n");
 	}
 }
 
@@ -180,7 +191,7 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
 	traceback* final_path = NULL;
 	lab_info* new=NULL;
 	slot** slot_matrix = NULL;
-
+	int not_valid_flag=1;
 	new = (lab_info*)malloc(sizeof(lab_info));
 
     while (((a=fscanf(fptr_in, "%d %d %d %d %d", 
@@ -195,21 +206,31 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
 		new->C_target=C1_aux;
 		new->P=P_aux;
 
-        a=teste_valid_mapa(L_aux, C_aux, L1_aux, C1_aux, 'A', 1, 0, 0, P_aux);
+        not_valid_flag=isMapValid(L_aux, C_aux, L1_aux+1, C1_aux+1,P_aux);
 
-        if(a!=0){
+        if(not_valid_flag==0){
             /*situação mapa inválido*/
-            if (a==-3)
-                exit(0);
-
             while (i_P<P_aux){ /* salta o resto da leitura do mapa*/
                 if((fscanf(fptr_in, "%*d %*d %*d"))==0)
                     i_P++;
             }  
             i_P=0;
+			write_to_file(fptr_out, final_path,not_valid_flag);
         }
 
-        else{
+		if(not_valid_flag==2)
+		{
+			 while (i_P<P_aux){ /* salta o resto da leitura do mapa*/
+                if((fscanf(fptr_in, "%*d %*d %*d"))==0)
+                    i_P++;
+            }  
+            i_P=0;
+			write_to_file(fptr_out, final_path,not_valid_flag);
+
+		}
+
+        if(not_valid_flag==1)
+		{
             //mapa válido 
 			slot_matrix=init_slot_matrix(new);
 
@@ -225,20 +246,24 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
                 }
             }  
             i_P=0;
+			final_path = dijsktra(new, PQ,slot_matrix); 
+
+			for(i=1;i<=final_path->steps;i++){
+				/*printf("\n (%d,%d)",final_path->path[i].l,final_path->path[i].c);*/
+			}
+			/*printf("\n broke %d",final_path->steps);*/
+
+			write_to_file(fptr_out, final_path,not_valid_flag);
+
+			for(i=0;i<new->L;i++){ 
+        		free(slot_matrix[i]);
+    		}
+
+    		free(slot_matrix);
+			free(final_path->path);
+			free(final_path);
 	    }
 
-		final_path = dijsktra(new, PQ,slot_matrix); 
-
-		for(i=1;i<=final_path->steps;i++){
-			printf("\n (%d,%d)",final_path->path[i].l,final_path->path[i].c);
-		}
-		printf("\n broke %d",final_path->steps);
-
-		write_to_file(fptr_out, final_path);
-
-		free(final_path->path);
-		free(final_path);
-		
     }
 	free(new);
     return;
@@ -275,7 +300,7 @@ minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 	PQ->size=size_of_new;
 	/*PQ->idx_vect=(int*)malloc(PQ->size*sizeof(int));*/
 
-	printf("L %d, C %d\n", lab->L, lab->C); fflush(stdout);
+	/*printf("L %d, C %d\n", lab->L, lab->C); fflush(stdout);*/
 	for(i=0; i<lab->L; i++){
 		for(j=0; j<lab->C; j++){
 			PQ->minHeap_array[k]->l=i;
@@ -471,4 +496,18 @@ void free_PQ(minHeap *PQ, int V)
 	}
 	free(PQ->minHeap_array);
 	free(PQ);
+}
+
+int isMapValid(int l,int c,int l1,int c1,int p){
+
+	if((l>0)&&(c>0)&&(l1==1)&&(c1==1)&&(p>=0)){
+		return 2;
+	}
+	if((l>0)&&(c>0)&&(l1>0)&&(l1<=l)&&(c1>0)&&(c1<=c)&&(p>=0)){
+		return 1;
+	}else{
+		/*printf("not valid !");*/
+		return 0;
+	}
+	return 0;
 }

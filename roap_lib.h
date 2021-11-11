@@ -65,8 +65,6 @@ typedef struct traceback{
 
 int N_mapas;
 int vect_insert_pos;
-
-int hash_size;
 int C_aux;
 
 
@@ -79,9 +77,9 @@ FILE* open_file_in(char* filename);
 FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
 char* check_extension (char* nome_file_out, char* filename, int fase_flag);
-void write_to_file(FILE* fptr,traceback* path);
+void write_to_file(FILE* fptr,traceback* path,int flag);
 void Data_Process_final(FILE* fptr, FILE* fptr_out,minHeap* PQ);
-
+int isMapValid(int l,int c,int l1,int c1,int p);
 FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag);
 
 /*djisktra*/
