@@ -24,25 +24,19 @@ slot** init_slot_matrix(lab_info* lab)
 			slot_matrix[j][k].p=0;
 		}
 	}
-	printf("slot matrix allocada");
+	/*printf("slot matrix allocada");*/
 	return slot_matrix;
 }
 
 traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 {
-	int noSolFlag;
-	int i;
 	traceback* final_path=NULL;
 	int dir_flag; /*right 1 left 2 down 3 up 4*/
 	int target_flag=0;
-	int cost_at_end;
 	int cost_n; /*cost of neighbour path*/
 	int alt; /*to compare weights*/
 	coord* v = NULL;  /*do i need to alloc this pointers to structs ??*/
 	coord* u_pop = NULL;
-
-	int l_previous;
-	int c_previous;
 
 	//slot_matrix=init_slot_matrix(lab);
 	PQ = PQ_restart(lab,PQ);
@@ -57,25 +51,23 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 	slot_matrix[0][0].parent_position.c=-1;
 	PQ = PQ_update(PQ,slot_matrix,0,0);
 
-	PQ_print(PQ,slot_matrix);
+	/*PQ_print(PQ,slot_matrix);*/
 
-	printf("\n##################");
+	/*printf("\n##################");*/
 
 	while(!isEmpty(PQ))
 	{
 		u_pop = PQ_pop(PQ,slot_matrix,u_pop); ;
 
 		if(slot_matrix[u_pop->l][u_pop->c].w==INF){
-			noSolFlag==1;
 			break;
 		}
 
-		printf("\n\n popped (%d,%d)",u_pop->l,u_pop->c);
+		/*printf("\n\n popped (%d,%d)",u_pop->l,u_pop->c);*/
 
 		if(isTarget(u_pop,lab)==1)
 		{
-			target_flag=1;
-			cost_at_end = slot_matrix[u_pop->l][u_pop->c].w; 
+			target_flag=1; 
 			break;
 		}
 
@@ -85,13 +77,13 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 		dir_flag=1;
 		if((cost_n = is_neighbour_valid(v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
+			/*printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);*/
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				/*printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);*/
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -105,13 +97,13 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 		dir_flag=2;
 		if((cost_n = is_neighbour_valid(v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
+			/*printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);*/
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w;
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				/*printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);*/
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -125,13 +117,13 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 		dir_flag=3;
 		if((cost_n = is_neighbour_valid(v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
+			/*printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);*/
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				/*printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);*/
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -145,13 +137,13 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 		dir_flag=4;
 		if((cost_n = is_neighbour_valid(v,u_pop,slot_matrix,lab,PQ,dir_flag))>=0)
 		{
-			printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);
+			/*printf("\n / neighbour valid at (%d,%d) with a cost of %d /",v->l,v->c,cost_n);*/
 			alt = cost_n + slot_matrix[u_pop->l][u_pop->c].w; 
 			if (alt < slot_matrix[v->l][v->c].w ){
 				slot_matrix[v->l][v->c].w = alt;
 				slot_matrix[v->l][v->c].parent_position.l=u_pop->l;
 				slot_matrix[v->l][v->c].parent_position.c=u_pop->c;
-				printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);
+				/*printf(" -> parent of (%d,%d) is updated to (%d,%d)",v->l,v->c,slot_matrix[v->l][v->c].parent_position.l,slot_matrix[v->l][v->c].parent_position.c);*/
 				PQ = PQ_update(PQ,slot_matrix,v->l,v->c);
 			}
 		}
@@ -160,27 +152,23 @@ traceback* dijsktra(lab_info* lab, minHeap* PQ,slot** slot_matrix)
 	
 	if(target_flag==1)
 	{
-		int aux_l=slot_matrix[u_pop->l][u_pop->c].parent_position.l;
-		int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;
-		printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);
-		PQ_print(PQ,slot_matrix);
+		/*int aux_l=slot_matrix[u_pop->l][u_pop->c].parent_position.l;*/
+		/*int aux_c=slot_matrix[u_pop->l][u_pop->c].parent_position.c;*/
+		/*printf("\nTARGET HIT at %d %d with cost of %d\n",u_pop->l, u_pop->c,slot_matrix[aux_l][aux_c].w);*/
+		/*PQ_print(PQ,slot_matrix);*/
 		final_path=tracebackaroni(slot_matrix,final_path,lab,target_flag,u_pop);
     	
 	}
 	else
 	{
-
-		printf("\n\n NO SOLUTION\n\n\n");
+		/*printf("\n\n NO SOLUTION\n\n\n");*/
 		final_path=tracebackaroni(slot_matrix,final_path,lab,target_flag,u_pop);
 		/*return traceback with flag of not found*/
 	}
 	
-	printf("\n ----end of dijsktra");
-	for(i=0;i<lab->L;i++){ 
-        	free(slot_matrix[i]);
-    	}
-    	free(slot_matrix);
-
+	/*printf("\n ----end of dijsktra");*/
+	free(v);
+	/*free PQ->vect[indx]*/
 	return final_path;
 
 }
@@ -200,7 +188,7 @@ int is_neighbour_valid(coord* v,coord* atual,slot** slot_matrix,lab_info* lab,mi
 
 	if(PQ_find(PQ,v->l,v->c)!=1) /*is in PQ ?*/
 	{
-		printf("\n (%d ,%d ) is not in PQ",v->l,v->c);
+		/*printf("\n (%d ,%d ) is not in PQ",v->l,v->c);*/
 			return -1;
 	} 
 	
@@ -225,7 +213,7 @@ int is_neighbour_valid(coord* v,coord* atual,slot** slot_matrix,lab_info* lab,mi
 			else
 			{/*crosses to not white*/
 				return-1;
-				printf("\n not valid crossing to (%d,%d)",v->l,v->c);
+				/*printf("\n not valid crossing to (%d,%d)",v->l,v->c);*/
 			}
 		}
 		else /*not same direction when crossing*/
@@ -253,7 +241,7 @@ int is_neighbour_valid(coord* v,coord* atual,slot** slot_matrix,lab_info* lab,mi
 			{
 				return neighbour_weight;
 			}else{
-				printf("\n not valid neighbour (%d,%d) cause next neighbour in same dir is not white ", v->l,v->c);
+				/*printf("\n not valid neighbour (%d,%d) cause next neighbour in same dir is not white ", v->l,v->c);*/
 				return -1;
 			}
 		}
@@ -274,7 +262,7 @@ int isTarget(coord* u,lab_info* lab){
 
 traceback* tracebackaroni(slot** slot_matrix,traceback* final_path,lab_info* lab,int target_flag,coord* target)
 {
-	printf("\n____PATH");
+	/*printf("\n____PATH");*/
 	int break_walls=0;
 	int a;
 	int step_count = 0; /*to include starting point*/
@@ -326,12 +314,14 @@ traceback* tracebackaroni(slot** slot_matrix,traceback* final_path,lab_info* lab
 			final_path->path[break_walls].c=crawler_c;
 			final_path->path[break_walls].w=a;
 
-			printf("\n(%d,%d) is a wall of weight %d ",crawler_l,crawler_c,a);
+			/*printf("\n(%d,%d) is a wall of weight %d ",crawler_l,crawler_c,a);*/
 		}
 		final_path->steps=break_walls;
 		final_path->total_cost=total_cost;
 	}
 	
+	free(target);
+
 	return final_path;
 }
 
