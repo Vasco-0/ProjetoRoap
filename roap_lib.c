@@ -1,14 +1,19 @@
 /*
-	Library for auxilary functions
-	->open_file
-	->check_args 
-	->check_extension
+	93199 Vasco Oliveira
+	92957 Rodrigo Murta
 */
 #include "roap_lib.h"
 
-
+/*
+*	Description: opens file to read
+*
+*	Arguments: name of file to open
+*
+*	Return: pointer to file
+*
+*/
 FILE* open_file_in (char* filename){
-    
+/* self explanatory */
     FILE *fp;  
 	fp = fopen(filename, "r");
 	if (fp == NULL){
@@ -17,21 +22,39 @@ FILE* open_file_in (char* filename){
 	return fp;
 }
 
+
+/*
+*	Description: opens file to read
+*
+*	Arguments: name of file to open
+*
+*	Return: pointer to file
+*
+*/
 FILE* open_file_out (char* filename){
-    
+/* self explanatory */
     FILE *fp;
 
 	fp = fopen(filename, "w");
 	if (fp == NULL){
-		/*printf("EXIT out\n"); fflush(stdout);*/
+		
 		exit(0);
 	}
 
 	return fp;
 }
 
-int check_args(int argc, char**argv){ 
 
+/*
+*	Description: checks arguments of argv and indicates project fase
+*
+*	Arguments: argc, argv
+*
+*	Return: flag for project fase
+*
+*/
+int check_args(int argc, char**argv){ 
+/* self explanatory */
 	int flag;
 
 	if((argc<2)||(argc>=4)){
@@ -48,8 +71,17 @@ int check_args(int argc, char**argv){
 }
 
 
+/*
+*	Description: checks extention of file to read and generates name of file to write
+*
+*	Arguments: name of file to write, to change, name of file to read, flag for project fase
+*
+*	Return:
+*
+*/
 char* check_extension (char* nome_file_out, char* filename, int fase_flag)
 {
+	/* self explanatory */
 	char* check_ext;
 	char ext_out1[] = ".sol1";
 	char ext_out[]= ".sol";
@@ -85,8 +117,16 @@ char* check_extension (char* nome_file_out, char* filename, int fase_flag)
 	return nome_file_out;
 }
 
-FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 
+/*
+*	Description: reads file onde and checks largest dimensions to allocate data structures once 
+*
+*	Arguments: pointers to update peak map dimensions, pointer to file to read, fase flag
+*
+*	Return: file pointer (rewinded)
+*
+*/
+FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
     int i_P=0;
 
     int L_aux_m, C_aux_m, L1_aux_m, C1_aux_m, var_aux_m, P_aux_m;
@@ -157,17 +197,27 @@ FILE* maior_mapa(FILE* fptr, int* C_max, int* L_max, int* P_max, int fase_flag){
 }
 
 
-void write_to_file(FILE* fptr, traceback* traceback,int notvalid)
+
+/*
+*	Description: writes solution to file
+*
+*	Arguments: solution vector, flag if the source is the same as target, file pointer
+*
+*	Return: void
+*
+*/
+void write_to_file(FILE* fptr, traceback* traceback, int notvalid)
 {
+	/*self explanatory */
 	int i=0;
 
 	if(notvalid==2){
-		fprintf(fptr,"0\n");
+		fprintf(fptr,"0\n\n");
 		return;
 	}
 
 	if(notvalid==0){
-		fprintf(fptr,"-1\n");
+		fprintf(fptr,"-1\n\n");
 		return;
 	}
 
@@ -177,17 +227,26 @@ void write_to_file(FILE* fptr, traceback* traceback,int notvalid)
 		for(i=traceback->steps;i>=1;i--){
 			fprintf(fptr,"%d %d %d\n", (traceback->path[i].l+1), traceback->path[i].c+1, traceback->path[i].w);
 		}
-		fprintf(fptr,"\n\n");
+
 	}
+	fprintf(fptr,"\n\n");
 }
 
 
+/*
+*	Description: Processes file. for each map: reads map data to fill structures, sovles map with dijkstra and writes to file
+*
+*	Arguments: file pointers, pointer to PQ inicialized in main
+*
+*	Return: void
+*
+*/
 void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
-
+ /*like a secondary main function that executes once and produces the output*/
     int i;
     int lin, col, val;
     int i_P;
-    int a, L_aux, /*C_aux,*/ L1_aux, C1_aux, P_aux;
+    int a, L_aux, L1_aux, C1_aux, P_aux;
 	traceback* final_path = NULL;
 	lab_info* new=NULL;
 	slot** slot_matrix = NULL;
@@ -231,7 +290,7 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
 
         if(not_valid_flag==1)
 		{
-            //mapa válido 
+            /*mapa válido */
 			slot_matrix=init_slot_matrix(new);
 
             while (i_P<P_aux){
@@ -247,11 +306,6 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
             }  
             i_P=0;
 			final_path = dijsktra(new, PQ,slot_matrix); 
-
-			for(i=1;i<=final_path->steps;i++){
-				/*printf("\n (%d,%d)",final_path->path[i].l,final_path->path[i].c);*/
-			}
-			/*printf("\n broke %d",final_path->steps);*/
 
 			write_to_file(fptr_out, final_path,not_valid_flag);
 
@@ -269,7 +323,17 @@ void Data_Process_final(FILE* fptr_in, FILE* fptr_out, minHeap* PQ){
     return;
 }
 
-int get_weight (int L, int C, lab_info* lab,slot** slot_matrix)
+
+
+/*
+*	Description: gets cost(weight) of cell
+*
+*	Arguments: matrix, cell coordinates and lab info
+*
+*	Return: returns wall weight
+*
+*/
+int get_weight (int L, int C, lab_info* lab, slot** slot_matrix)
 {
 	if(L>=lab->L || C>=lab->C || L<0 || C<0)
 		return -2; /*out of bounds*/
@@ -277,10 +341,20 @@ int get_weight (int L, int C, lab_info* lab,slot** slot_matrix)
 	return slot_matrix[L][C].p;
 }
 
+
+/*
+*	Description: allocates initializes priority queue of size of largest map
+*
+*	Arguments: pointer to PQ, size
+*
+*	Return: PQ
+*
+*/
 minHeap* PQ_init(minHeap* PQ, int V)
 {
 	int i;
 	PQ = (minHeap*)malloc(sizeof(minHeap));
+	PQ->idx_vect=(int*)malloc(V*sizeof(int));
 	PQ->minHeap_array = (coord**) malloc(V*sizeof(coord*));
 	for(i=0; i<V;i++){
 		PQ->minHeap_array[i] = (coord*) malloc(sizeof(coord));
@@ -291,6 +365,14 @@ minHeap* PQ_init(minHeap* PQ, int V)
 }
 
 
+/*
+*	Description: restarts priority queue for every map
+*
+*	Arguments: (pointers to) priority queue and to map info
+*
+*	Return:
+*
+*/
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 {
 	int i, j, k=0;
@@ -298,62 +380,49 @@ minHeap* PQ_restart(lab_info* lab, minHeap* PQ)
 
 	size_of_new = (lab->L)*(lab->C);
 	PQ->size=size_of_new;
-	/*PQ->idx_vect=(int*)malloc(PQ->size*sizeof(int));*/
 
-	/*printf("L %d, C %d\n", lab->L, lab->C); fflush(stdout);*/
 	for(i=0; i<lab->L; i++){
 		for(j=0; j<lab->C; j++){
 			PQ->minHeap_array[k]->l=i;
 			PQ->minHeap_array[k]->c=j;
-			/*PQ->idx_vect[l*C_max+c]=k;*/
+			PQ->idx_vect[i*C_aux+j]=k;
 			k++;
 		}
 	}
 
-	/*
-	int l, c, z;
-	for(i=0; i<lab->L; i++){
-		l=i;
-		c=i;
-		PQ->minHeap_array[k]->l=l;
-		PQ->minHeap_array[k]->c=c;
-		k++;
-		printf("k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
-		for (j=l, z=c; j>=0 || z>=0; j--, z--){
-			PQ->minHeap_array[k]->l=l;
-			PQ->minHeap_array[k]->c=k-1;
-			k++;
-			printf("->k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
-			PQ->minHeap_array[k]->l=j-1;
-			PQ->minHeap_array[k]->c=c;	
-			k++;
-			printf("->k=%d l=%d c=%d\n", k, l, c); fflush(stdout);
-		}
-	}
-	*/
-	
 	return PQ;
 }
 
 
-minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c) /*receber coordenada que recebeu atualização (menor custo) e reordena heap*/
+/*
+*	Description: receber coordenada que recebeu atualização (menor custo) e reordena heap
+*
+*	Arguments: pointer to PQ, matrix, coordinates
+*
+*	Return: PQ
+*
+*/
+minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c) 
 {
-	int i;
-	//printf("\nin update\n"); fflush(stdout);
-	for(i=0; i<PQ->size; i++){
-		if((l==PQ->minHeap_array[i]->l) && (c==PQ->minHeap_array[i]->c)){	
-
-			PQ = fixup(i, PQ, slot_matrix);
-		}
+	int i=PQ->idx_vect[l*C_aux+c];
+	
+	if((PQ->minHeap_array[i]->l==l) && (PQ->minHeap_array[i]->c==c)){	
+		PQ = fixup(i, PQ, slot_matrix);
 	}
 
 	return PQ;
 }
 
-
+/*
+*	Description: pop of less cost (highest priority) element at top of heap. Switch node with last and fixdown
+*
+*	Arguments: pointer to PQ, matrix, coordinates of top element
+*
+*	Return:
+*
+*/
 coord* PQ_pop(minHeap* PQ, slot** slot_matrix, coord* top)
 {	
-	//printf("in pop\n"); fflush(stdout);
 	top->l=PQ->minHeap_array[0]->l;
 	top->c=PQ->minHeap_array[0]->c;
 	
@@ -365,99 +434,107 @@ coord* PQ_pop(minHeap* PQ, slot** slot_matrix, coord* top)
 }
 
 
-
+/*
+*	Description: fixes heap after element priority is decreased (pop): recursively swaps element with child while child priority is higher 
+*
+*	Arguments: *PQ, matrix, position in PQ of element to fix (parent)
+*
+*	Return: PQ
+*
+*/
 minHeap* fixdown(minHeap* PQ, slot** slot_matrix, int parent)
 {	
 	int left = 2*parent+1;
     int right = 2*parent+2;
 	int min;
 
-
-	/*printf("\nin fixdown\n"); fflush(stdout);
-	printf("size: %d\nparent: %d, left: %d, right: %d\n", PQ->size, parent, left, right); fflush(stdout);
-	printf("w_parent %d, w_left %d, w_right %d\n", 
-				slot_matrix[PQ->minHeap_array[parent]->l][PQ->minHeap_array[parent]->c].w,
-				slot_matrix[PQ->minHeap_array[left]->l][PQ->minHeap_array[left]->c].w,
-				slot_matrix[PQ->minHeap_array[right]->l][PQ->minHeap_array[right]->c].w); fflush(stdout);
-	*/
 	if (PQ->size>1)
   	{
 		if ((left >= PQ->size) ||  left < 0){
       		left = -1;
-			//printf("left>\n"); fflush(stdout);
+
 			}
     	if ((right >= PQ->size) || right < 0){
       		right = -1;
-			//printf("right>\n"); fflush(stdout);
+			
 			}
 
     	if (left != -1  &&  less_pri(left, parent, PQ, slot_matrix)==0){
 			min=left;
-			//printf("min= left\n"); fflush(stdout);
+		
 		}
 		else{
 			min = parent;
-			//printf("min=parent\n"); fflush(stdout);
+			
 		}
 		if (right != -1  &&  less_pri(right, min, PQ, slot_matrix)==0)
       		min=right;
 
 		if(min!=parent){
-			//printf("exch\n"); fflush(stdout);
+			
 			exch(parent, min, PQ);
       		PQ=fixdown(PQ, slot_matrix, min);
     	}
   	}
-	//printf("out fixdown\n"); fflush(stdout);
+	
 	return PQ;
 }
 
 
+/*
+*	Description: fixes heap after element priority is increased (update): recursively swaps element with parent while parent priority is lower or becomes node 
+*
+*
+*	Arguments: *PQ, matrix, position in PQ of element to fix 
+*
+*	Return:
+*
+*/
 minHeap* fixup(int idx, minHeap* PQ, slot** slot_matrix)
 {
 	int parent=(idx-1)/2;
-	//printf("->in fixup\n"); fflush(stdout);
-	/*printf("w_parent %d, w_idx %d\n", 
-				slot_matrix[PQ->minHeap_array[parent]->l][PQ->minHeap_array[parent]->c].w,
-				slot_matrix[PQ->minHeap_array[idx]->l][PQ->minHeap_array[idx]->c].w); fflush(stdout);
-*/
+
 	if(less_pri(parent, idx, PQ, slot_matrix)==1){
-		//printf("swap\n"); fflush(stdout);
-		//printf("pre exch: prt l=%d prt c=%d, idx l=%d, idx c=%d\n", PQ->minHeap_array[parent]->l, PQ->minHeap_array[parent]->c,
-		 //		PQ->minHeap_array[idx]->l, PQ->minHeap_array[idx]->c); fflush(stdout);
+		
 		PQ = exch(parent, idx, PQ);
-		//printf("pos exch: prt l=%d prt c=%d, idx l=%d, idx c=%d\n", PQ->minHeap_array[parent]->l, PQ->minHeap_array[parent]->c,
-		 //		PQ->minHeap_array[idx]->l, PQ->minHeap_array[idx]->c); fflush(stdout);
+		
 		PQ = fixup(parent, PQ, slot_matrix);
 	}
-	//printf("->out fixup\n"); fflush(stdout);
+	
 	return PQ;
 }
 
 
-
-int PQ_find(minHeap* PQ, int l, int c) /*recebe coordenada e vê se está no PQ*/
+/*
+*	Description: checks if cell is in PQ
+*
+*	Arguments: cell coordinates
+*
+*	Return: 1 if yes, 0 if not
+*
+*/
+int PQ_find(minHeap* PQ, int l, int c) 
 {
-	int i;
+	int i=PQ->idx_vect[l*C_aux+c];
 
-	for(i=0; i<PQ->size; i++){
-		if((l==PQ->minHeap_array[i]->l) && (c==PQ->minHeap_array[i]->c)){
-			return 1;
-		}
-	}		
+	if(PQ->minHeap_array[i]->l==l && PQ->minHeap_array[i]->c==c)
+		return 1;
+
+
 	return 0;
 }
 
 
+/*
+*	Description: compares the costs of two elements a, b (if k(a)>k(b))
+*
+*	Arguments: indexes of elements a, b
+*
+*	Return: 1 if yes (k(a)>k(b)), 0 if not
+*
+*/
 int less_pri(int a, int b, minHeap* PQ, slot** slot_matrix)
 {	
-	/*
-	para i=a,b:
-	mat_coord_l= heap[i].l
-	mat_coord_c= heap[i].c
-	custo= mat[mat_coord_l][mat_coord_c].w
-	=>if custo_a < custo_b...
-	*/
 	if(slot_matrix[PQ->minHeap_array[a]->l][PQ->minHeap_array[a]->c].w
 		> slot_matrix[PQ->minHeap_array[b]->l][PQ->minHeap_array[b]->c].w)
 		return 1;
@@ -465,29 +542,38 @@ int less_pri(int a, int b, minHeap* PQ, slot** slot_matrix)
 		return 0;
 }
 
+
+/*
+*	Description: swaps two elements of heap (PQ) and respective indexes in mapping vector
+*
+*	Arguments: indexes of a, b
+*
+*	Return: PQ
+*
+*/
 minHeap* exch(int a, int b, minHeap* PQ)
 {	
 	coord *aux;
 
+	PQ->idx_vect[PQ->minHeap_array[a]->l * C_aux + PQ->minHeap_array[a]->c]=b;
+	PQ->idx_vect[PQ->minHeap_array[b]->l * C_aux + PQ->minHeap_array[b]->c]=a;
+	
 	aux=PQ->minHeap_array[a];
 	PQ->minHeap_array[a]=PQ->minHeap_array[b];
 	PQ->minHeap_array[b]=aux;
-
-	
-	/*idx_vect: vetor de tamnaho V, cujos indices sao a celula 
-	(convertida para notação de vertice), que contem o indice atual da celula em heap*/
-	/*
-	int i_a=PQ->idx_vect->[PQ->minHeap_array[a]->l * C_max + PQ->minHeap_array[a]->c;
-	int i_b=PQ->idx_vect->[PQ->minHeap_array[b]->l * C_max + PQ->minHeap_array[b]->c]
-	int temp = i_a;
-	i_a=i_b;
-	i_b=temp;
-	*/
 
 	return PQ;
 }
 
 
+/*
+*	Description: frees allocated memory of PQ
+*
+*	Arguments: PQ, size 
+*
+*	Return: void
+*
+*/
 void free_PQ(minHeap *PQ, int V)
 {
 	int i;
@@ -495,18 +581,29 @@ void free_PQ(minHeap *PQ, int V)
 		free(PQ->minHeap_array[i]);
 	}
 	free(PQ->minHeap_array);
+	free(PQ->idx_vect);
 	free(PQ);
 }
 
+
+/*
+*	Description: checks if map is valid duh
+*
+*	Arguments: map information
+*
+*	Return: 1 if yes 0 if no
+*
+*/
 int isMapValid(int l,int c,int l1,int c1,int p){
 
 	if((l>0)&&(c>0)&&(l1==1)&&(c1==1)&&(p>=0)){
+		/* situação específica de source = target*/
 		return 2;
 	}
 	if((l>0)&&(c>0)&&(l1>0)&&(l1<=l)&&(c1>0)&&(c1<=c)&&(p>=0)){
 		return 1;
 	}else{
-		/*printf("not valid !");*/
+		
 		return 0;
 	}
 	return 0;

@@ -39,16 +39,15 @@ int* Data_Process(int* respostas, Lab* new_lab, FILE* fptr, int** mat){
         a=teste_valid_mapa(L_aux, C_aux, L1_aux, C1_aux, A_var, var_aux, L2_aux, C2_aux,P_aux);
 
         if(a!=0){
-            //situação mapa inválido
+            /*situação mapa inválido*/
             if (a==-3)
                 exit(0);
 
-            //new_lab->Resposta = -1; // parede preta A1 ??
         
-            if(a==-2){ // situação fora dos limites
+            if(a==-2){ 
                 resposta = -2;
             }
-            while (i_P<P_aux){ // salta o resto da leitura do mapa
+            while (i_P<P_aux){
                 if((fscanf(fptr, "%*d %*d %*d"))==0)
                     i_P++;
             }  
@@ -56,7 +55,7 @@ int* Data_Process(int* respostas, Lab* new_lab, FILE* fptr, int** mat){
         }
 
         else{
-            //mapa válido 
+             
             while (i_P<P_aux){
                 if(fscanf(fptr,"%d %d %d", &lin, &col, &val)==3){
                     if((lin>=0)&&(lin<=L_aux)&&(col>=0)&&(col<=C_aux)){
@@ -124,20 +123,6 @@ Lab* struct_insert (Lab* new_lab,
 
 	return new_lab;
 }
-
-
-
-/***********************************************************************/
-/*void free_vect(Lab* vect)
-{	
-   int i;
-   
-   for (i=0; i<N_mapas; i++){
-      free (vect[i]->resposta);
-   }
-   free (vect);
-   return;
-}*/
 
 
 /***********************************************************************/
@@ -291,7 +276,7 @@ int solver_4 (Lab* new_lab, int** mat)
 /***********************************************************************/
 int solver_5 (Lab* new_lab, int** mat)
 {
-    if ((new_lab->L1 > new_lab->L) || (new_lab->C1 > new_lab->C)) //cinza ?
+    if ((new_lab->L1 > new_lab->L) || (new_lab->C1 > new_lab->C)) 
         return -2;
     if(mat[new_lab->L1][new_lab->C1]==0)
         return -1;
