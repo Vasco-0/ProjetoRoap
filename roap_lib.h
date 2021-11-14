@@ -6,7 +6,16 @@
 #include <string.h>
 #include <limits.h>
 
-typedef struct coord{ /*mesma função de um node name num grafo*/
+/*
+
+93199 Vasco Oliveira 
+92957 Rodrigo Murta 
+GR104
+
+*/
+
+
+typedef struct coord{ 
     int l;
     int c;
     int w;
@@ -17,13 +26,15 @@ typedef struct slot{
     int w;
     int p; 
     coord parent_position;
+    int flag;
 
 }slot;
 
 typedef struct minHeap{
 
-    int size; /*LxC quando iniciado*/
-    coord** minHeap_array; /*double pointer para facilidade de rearranjar array*/
+    int size; 
+    int* idx_vect;
+    coord** minHeap_array; 
 
 }minHeap;
 
@@ -39,9 +50,9 @@ typedef struct Lab
     int P;    
 } Lab;
 
-typedef struct lab_info{ /*para o final*/
+typedef struct lab_info{ 
 
-    int id; /* for debug purposes */
+    int id; 
     int L;
     int C;
     int L_target;
@@ -50,14 +61,13 @@ typedef struct lab_info{ /*para o final*/
     int B; 
     int valid_flag;
     struct lab_info * next;
-    /*talvez adicionar lista de paredes* partidas*/
 
 }lab_info;
 
 typedef struct traceback{
 
     int flag_found;
-    int steps; /*size of path */
+    int steps; 
     int total_cost;
     coord* path;
 
@@ -68,11 +78,9 @@ int vect_insert_pos;
 int C_aux;
 
 
-/*  inf->custo "infinito"
-    out->não pertence ao grafo (visto que 0 já é um custo valido)*/
 #define INF INT_MAX
 
-/*================= lib.c ====================*/ 
+/*================= Fase Final Roap ====================*/ 
 FILE* open_file_in(char* filename);
 FILE* open_file_out(char* filename);
 int check_args(int argc, char**argv);
@@ -101,8 +109,8 @@ void PQ_print(minHeap* PQ, slot** slot_matix);
 
 /*PQ*/
 minHeap* PQ_init(minHeap* PQ, int V);
-int PQ_find(minHeap* PQ, int l,int c); /*verifica se existe na queue o par (l,c) e retorna um apontador para a estrutura */
-coord* PQ_pop(minHeap* PQ,slot** slo_matrix,coord* top);/*pop do valor do topo da queue*/
+int PQ_find(minHeap* PQ, int l,int c); 
+coord* PQ_pop(minHeap* PQ,slot** slo_matrix,coord* top);
 minHeap* PQ_restart(lab_info* lab, minHeap* PQ);
 minHeap* PQ_update(minHeap* PQ, slot** slot_matrix, int l, int c);
 minHeap* fixup(int idx,minHeap* PQ,slot** slot_matrix);
